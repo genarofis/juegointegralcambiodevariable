@@ -2,133 +2,154 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Juego de Integrales Pro</title>
-    <script>
-        window.MathJax = {
-            tex: { inlineMath: [['$', '$']], displayMath: [['$$', '$$']] },
-            options: {
-                enableExplorer: true,
-                renderActions: {
-                    addEvents: [200, (doc) => {
-                        // Esta función hace que las clases de LaTeX sean interactivas
-                        document.querySelectorAll('.dropzone').forEach(el => {
-                            el.addEventListener('dragover', e => e.preventDefault());
-                            el.addEventListener('drop', handleDrop);
-                        });
-                    }, '']
-                }
-            }
-        };
-    </script>
+    <title>Desafío de Cálculo: Integrales</title>
     <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background: #f8f9fa; display: flex; flex-direction: column; align-items: center; padding: 40px; }
-        .card { background: white; padding: 40px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); text-align: center; min-width: 500px; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; display: flex; flex-direction: column; align-items: center; padding: 40px; }
+        .card { background: white; padding: 40px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); text-align: center; min-width: 600px; }
         
-        /* Estilo de los huecos dentro de la fórmula */
-        .dropzone {
+        /* Huecos interactivos */
+        .hueco {
             display: inline-block;
-            min-width: 60px;
-            min-height: 40px;
-            border: 2px dashed #1a73e8 !important;
+            min-width: 70px;
+            height: 45px;
             background: #e8f0fe;
-            margin: 0 5px;
-            border-radius: 5px;
+            border: 2px dashed #1a73e8;
+            border-radius: 8px;
             cursor: pointer;
             vertical-align: middle;
+            margin: 0 5px;
+            transition: all 0.2s;
+            line-height: 45px;
+            padding: 0 10px;
             color: #1a73e8;
-            padding: 2px 8px;
         }
-        .dropzone:hover { background: #d2e3fc; }
+        .hueco:hover { background: #d2e3fc; border-color: #0d47a1; }
+        .hueco.seleccionado { border-color: #fbbc04; background: #fff8e1; box-shadow: 0 0 10px #fbbc04; }
+        .hueco.relleno { border-style: solid; background: white; width: auto; }
 
-        .opciones { display: flex; gap: 15px; justify-content: center; margin-top: 30px; }
-        .opcion { padding: 12px 20px; background: white; border: 2px solid #1a73e8; border-radius: 10px; cursor: grab; font-size: 1.3rem; }
-        
-        #score { font-size: 1.5rem; font-weight: bold; color: #1a73e8; margin-bottom: 20px; }
-        button { margin-top: 30px; padding: 12px 25px; background: #1a73e8; color: white; border: none; border-radius: 25px; cursor: pointer; font-size: 1rem; }
-        #msg { margin-top: 15px; font-weight: bold; height: 25px; }
+        .opciones-container { display: flex; gap: 12px; justify-content: center; margin-top: 30px; }
+        .opcion-btn {
+            padding: 10px 20px;
+            background: white;
+            border: 2px solid #1a73e8;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1.2rem;
+            color: #1a73e8;
+            transition: 0.3s;
+        }
+        .opcion-btn:hover { background: #1a73e8; color: white; }
+
+        .integral-display { font-size: 3rem; margin: 40px 0; display: flex; align-items: center; justify-content: center; }
+        #score { font-size: 1.5rem; color: #1a73e8; margin-bottom: 20px; font-weight: bold; }
+        button.verificar { margin-top: 30px; padding: 12px 40px; background: #1a73e8; color: white; border: none; border-radius: 25px; cursor: pointer; font-size: 1.1rem; }
+        #mensaje { margin-top: 20px; font-weight: bold; height: 30px; }
     </style>
 </head>
 <body>
 
-    <div id="score">Puntuación: <span>0</span></div>
+    <div id="score">Puntuación: 0</div>
 
     <div class="card">
-        <h2>Completa la integral correctamente</h2>
-        <div id="math-area" style="font-size: 3rem; margin: 40px 0;">
+        <h2>Completa la estructura de la integral</h2>
+        <p style="color: #666;">Haz clic en un cuadro azul y luego elige la función correcta</p>
+        
+        <div class="integral-display" id="integral-box">
             </div>
-        <div class="opciones" id="opciones-box"></div>
-        <button onclick="check()">Verificar Resultado</button>
-        <div id="msg"></div>
+
+        <div class="opciones-container" id="opciones-box"></div>
+        
+        <button class="verificar" onclick="comprobar()">Verificar</button>
+        <div id="mensaje"></div>
     </div>
 
     <script>
         let puntos = 0;
-        let estado = { u: '', du: '', rU: '', rDU: '' };
+        let idSeleccionado = null;
+        let config = { u: '', du: '', r1: null, r2: null };
 
         function generar() {
             const n = Math.floor(Math.random() * 3) + 2;
             const tipos = [
-                { // División (u en el denominador)
-                    u: `x^{${n}}`, du: `${n}x^{${n-1}}`,
-                    tex: `\\int \\frac{\\class{dropzone}{?_{du}}}{\\class{dropzone}{?_{u}}} \\, dx`
-                },
-                { // Raíz cuadrada
-                    u: `x^2+1`, du: `2x`,
-                    tex: `\\int \\class{dropzone}{?_{du}} \\cdot \\sqrt{\\class{dropzone}{?_{u}}} \\, dx`
-                },
                 { // Exponencial
                     u: `${n}x`, du: `${n}`,
-                    tex: `\\int \\class{dropzone}{?_{du}} \\cdot e^{\\class{dropzone}{?_{u}}} \\, dx`
+                    latex_pre: '\\int', latex_mid: '\\cdot e^{', latex_post: '} \\, dx'
                 },
-                { // Logaritmo
-                    u: `\\ln x`, du: `\\frac{1}{x}`,
-                    tex: `\\int \\class{dropzone}{?_{u}} \\cdot \\class{dropzone}{?_{du}} \\, dx`
+                { // Raíz
+                    u: `x^2`, du: `2x`,
+                    latex_pre: '\\int', latex_mid: '\\cdot \\sqrt{', latex_post: '} \\, dx'
+                },
+                { // Fracción
+                    u: `x^{${n}}`, du: `${n}x^{${n-1}}`,
+                    latex_pre: '\\int \\frac{', latex_mid: '}{', latex_post: '} \\, dx'
+                },
+                { // Trigonométrica
+                    u: `${n}x`, du: `${n}`,
+                    latex_pre: '\\int', latex_mid: '\\cdot \\cos(', latex_post: ') \\, dx'
                 }
             ];
 
-            const sel = tipos[Math.floor(Math.random() * tipos.length)];
-            estado = { u: sel.u, du: sel.du, rU: '', rDU: '' };
+            const t = tipos[Math.floor(Math.random() * tipos.length)];
+            config = { u: t.u, du: t.du, r1: null, r2: null };
+            idSeleccionado = null;
 
-            document.getElementById('math-area').innerHTML = `$$${sel.tex}$$`;
-            
+            // Construcción manual para evitar que MathJax rompa los eventos
+            const area = document.getElementById('integral-box');
+            area.innerHTML = `
+                <span>\\(${t.latex_pre}\\)</span>
+                <div id="h1" class="hueco" onclick="seleccionar('h1')"></div>
+                <span>\\(${t.latex_mid}\\)</span>
+                <div id="h2" class="hueco" onclick="seleccionar('h2')"></div>
+                <span>\\(${t.latex_post}\\)</span>
+            `;
+
             // Opciones
-            const ops = [sel.u, sel.du, 'x', '7'].sort(() => Math.random() - 0.5);
-            document.getElementById('opciones-box').innerHTML = ops.map(o => 
-                `<div class="opcion" draggable="true" ondragstart="drag(event)" data-val="${o}">$${o}$</div>`
+            const lista = [t.u, t.du, 'x', '5'].sort(() => Math.random() - 0.5);
+            document.getElementById('opciones-box').innerHTML = lista.map(o => 
+                `<button class="opcion-btn" onclick="rellenar('${o}')">\\(${o}\\)</button>`
             ).join('');
 
-            MathJax.typesetPromise();
+            MathJax.typeset();
         }
 
-        function drag(e) { e.dataTransfer.setData("text", e.target.dataset.val); }
+        function seleccionar(id) {
+            document.querySelectorAll('.hueco').forEach(h => h.classList.remove('seleccionado'));
+            idSeleccionado = id;
+            document.getElementById(id).classList.add('seleccionado');
+        }
 
-        function handleDrop(e) {
-            e.preventDefault();
-            const val = e.dataTransfer.getData("text");
-            const target = e.target.closest('.dropzone');
-            
-            // Guardamos la respuesta según qué hueco sea
-            if (target.innerText.includes('u') && !target.innerText.includes('du')) {
-                estado.rU = val;
-            } else {
-                estado.rDU = val;
+        function rellenar(valor) {
+            if (!idSeleccionado) {
+                alert("Primero haz clic en un cuadro azul de la integral");
+                return;
             }
-
-            target.innerHTML = val;
-            target.style.borderStyle = "solid";
-            MathJax.typesetPromise();
+            const el = document.getElementById(idSeleccionado);
+            el.innerHTML = `\\(${valor}\\)`;
+            el.classList.add('relleno');
+            el.classList.remove('seleccionado');
+            
+            if (idSeleccionado === 'h1') config.r1 = valor;
+            else config.r2 = valor;
+            
+            idSeleccionado = null;
+            MathJax.typesetPromise([el]);
         }
 
-        function check() {
-            const m = document.getElementById('msg');
-            if (estado.rU === estado.u && estado.rDU === estado.du) {
+        function comprobar() {
+            const m = document.getElementById('mensaje');
+            // Verificamos si las respuestas coinciden con la lógica (u y du)
+            // Nota: Dependiendo del tipo, el orden puede variar. 
+            // En este script h2 es generalmente el argumento (u) y h1 el factor (du)
+            // excepto en la fracción donde h2 es denominador (u) y h1 numerador (du).
+            
+            if (config.r1 === config.du && config.r2 === config.u) {
                 puntos++;
-                document.querySelector('#score span').innerText = puntos;
-                m.innerHTML = "<span style='color:green'>¡Excelente razonamiento!</span>";
+                document.getElementById('score').innerText = "Puntuación: " + puntos;
+                m.innerHTML = "<span style='color:green'>¡Correcto!</span>";
                 setTimeout(() => { m.innerText = ""; generar(); }, 1500);
             } else {
-                m.innerHTML = "<span style='color:red'>Revisa la posición de u y su derivada du.</span>";
+                m.innerHTML = "<span style='color:red'>Incorrecto. Revisa el cambio de variable.</span>";
             }
         }
 

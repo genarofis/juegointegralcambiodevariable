@@ -216,20 +216,55 @@
                         { tipo: 'latex', valor: ' dx' }
                     ];
                     break;
-                    
-                case 2: // Exponencial
+
+case 2: // Exponencial
                     let a = aleatorio(2, 4);
                     u = `${a}x`;
                     du = `${a}`;
-                    posU = 2;
-                    posDU = 1;
-                    partes = [
-                        { tipo: 'latex', valor: '\\int ' },
-                        { tipo: 'drop', id: 'drop1' },
-                        { tipo: 'latex', valor: ' \\cdot e^{' },
-                        { tipo: 'drop', id: 'drop2' },
-                        { tipo: 'latex', valor: '} dx' }
-                    ];
+                    posU = 2; // exponente
+                    posDU = 1; // multiplicando
+                    // Solución: Usamos CSS para elevar el cajón (vertical-align: super)
+                    integralHTML = `
+                        \\(\\int \\)
+                        <span class="espacio-drop" id="drop1" ondrop="drop(event)" ondragover="allowDrop(event)"></span>
+                        \\( \\cdot e \\)
+                        <span class="espacio-drop" id="drop2" ondrop="drop(event)" ondragover="allowDrop(event)" style="vertical-align: super; transform: scale(0.8); margin: 0 0 15px 5px;"></span>
+                        \\( dx\\)
+                    `;
+                    break;
+
+                case 6: // Logaritmo (Fracción)
+                    u = `\\ln x`;
+                    du = `\\frac{1}{x}`;
+                    posU = 2; // denominador
+                    posDU = 1; // numerador
+                    // Solución: Construimos la fracción con CSS (flexbox) para no romper MathJax
+                    integralHTML = `
+                        \\(\\int \\)
+                        <div style="display: inline-flex; flex-direction: column; align-items: center; vertical-align: middle; margin: 0 10px;">
+                            <span class="espacio-drop" id="drop1" ondrop="drop(event)" ondragover="allowDrop(event)" style="margin: 0 0 5px 0; min-height: 40px;"></span>
+                            <div style="border-bottom: 2px solid #000; width: 100%;"></div>
+                            <span class="espacio-drop" id="drop2" ondrop="drop(event)" ondragover="allowDrop(event)" style="margin: 5px 0 0 0; min-height: 40px;"></span>
+                        </div>
+                        \\( dx\\)
+                    `;
+                    break;
+
+                case 7: // Raíz
+                    let m = aleatorio(2, 3);
+                    u = `x^{${m}}`;
+                    du = `${m}x^{${m-1}}`;
+                    posU = 2; // dentro de la raíz
+                    posDU = 1; // multiplicando
+                    // Solución: Matemáticamente, una raíz es una potencia fraccionaria. 
+                    // Usar paréntesis en lugar del símbolo de raíz evita fallos gráficos con las cajas HTML.
+                    integralHTML = `
+                        \\(\\int \\)
+                        <span class="espacio-drop" id="drop1" ondrop="drop(event)" ondragover="allowDrop(event)"></span>
+                        \\( \\cdot ( \\)
+                        <span class="espacio-drop" id="drop2" ondrop="drop(event)" ondragover="allowDrop(event)"></span>
+                        \\( )^{1/${m}} \\, dx\\)
+                    `;
                     break;
                     
                 case 3: // Seno
@@ -290,22 +325,7 @@
                         { tipo: 'latex', valor: '} dx' }
                     ];
                     break;
-                    
-                case 7: // Raíz
-                    let m = aleatorio(2, 3);
-                    u = `x^{${m}}`;
-                    du = `${m}x^{${m-1}}`;
-                    posU = 2;
-                    posDU = 1;
-                    partes = [
-                        { tipo: 'latex', valor: '\\int ' },
-                        { tipo: 'drop', id: 'drop1' },
-                        { tipo: 'latex', valor: ' \\cdot \\sqrt[' + m + ']{' },
-                        { tipo: 'drop', id: 'drop2' },
-                        { tipo: 'latex', valor: '} dx' }
-                    ];
-                    break;
-                    
+  
                 case 8: // Csc^2
                     let f = aleatorio(2, 4);
                     u = `${f}x`;

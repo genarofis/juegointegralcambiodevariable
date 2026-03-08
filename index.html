@@ -223,14 +223,13 @@ case 2: // Exponencial
                     du = `${a}`;
                     posU = 2; // exponente
                     posDU = 1; // multiplicando
-                    // Solución: Usamos CSS para elevar el cajón (vertical-align: super)
-                    integralHTML = `
-                        \\(\\int \\)
-                        <span class="espacio-drop" id="drop1" ondrop="drop(event)" ondragover="allowDrop(event)"></span>
-                        \\( \\cdot e \\)
-                        <span class="espacio-drop" id="drop2" ondrop="drop(event)" ondragover="allowDrop(event)" style="vertical-align: super; transform: scale(0.8); margin: 0 0 15px 5px;"></span>
-                        \\( dx\\)
-                    `;
+                    latex = `
+\\int
+\\htmlClass{drop}{\\square}
+\\cdot
+e^{\\htmlClass{drop}{\\square}}
+dx
+`;
                     break;
 
                 case 6: // Logaritmo (Fracción)
@@ -376,36 +375,58 @@ case 2: // Exponencial
             
             dibujar();
         }
-        
-        function dibujar() {
-            let html = '<div class="ejercicio"><div class="integral">';
-            
-            // Construir la integral parte por parte
-            ejercicioActual.partes.forEach(parte => {
-                if (parte.tipo === 'latex') {
-                    html += `<span class="latex">\\(${parte.valor}\\)</span>`;
-                } else {
-                    html += `<span class="espacio-drop" id="${parte.id}" ondrop="drop(event)" ondragover="allowDrop(event)"></span>`;
-                }
-            });
-            
-            html += '</div>';
-            
-            // Agregar opciones
-            html += '<div class="opciones-container">';
-            
-            ejercicioActual.opciones.forEach((opcion, index) => {
-                html += `<div class="opcion" draggable="true" ondragstart="drag(event)" data-value="${opcion}">\\(${opcion}\\)</div>`;
-            });
-            
-            html += '</div></div>';
-            
-            document.getElementById("ejercicio").innerHTML = html;
-            
-            if (window.MathJax) {
-                MathJax.typesetPromise();
-            }
-        }
+        function dibujar(){
+
+let html=""
+
+html+=`<div class="ejercicio">`
+
+html+=`
+<div class="integral">
+\\[
+${ejercicioActual.latex}
+\\]
+</div>
+`
+
+html+=`<div class="opciones-container">`
+
+ejercicioActual.opciones.forEach(opcion=>{
+
+html+=`
+<div class="opcion"
+draggable="true"
+ondragstart="drag(event)"
+data-value="${opcion}">
+\\(${opcion}\\)
+</div>
+`
+
+})
+
+html+=`</div></div>`
+
+document.getElementById("ejercicio").innerHTML=html
+
+MathJax.typesetPromise().then(()=>{
+
+let drops=document.querySelectorAll(".drop")
+
+drops[0].id="drop1"
+drops[1].id="drop2"
+
+drops.forEach(d=>{
+
+d.classList.add("espacio-drop")
+
+d.ondrop=drop
+d.ondragover=allowDrop
+
+})
+
+})
+
+}
         
         function allowDrop(ev) {
             ev.preventDefault();

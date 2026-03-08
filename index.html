@@ -150,8 +150,32 @@ let distractores=[
 
 ]
 
-let opciones=[base.g,base.dg]
+let opciones=[
 
+{id:"u",texto:base.g},
+{id:"du",texto:base.dg}
+
+]
+
+let distractores=[
+
+{id:"d1",texto:"x^2"},
+{id:"d2",texto:"2x"},
+{id:"d3",texto:"3x^2"},
+{id:"d4",texto:"x^3"},
+{id:"d5",texto:"4"}
+
+]
+
+while(opciones.length<6){
+
+let d=distractores[aleatorio(0,distractores.length-1)]
+
+if(!opciones.some(o=>o.texto==d.texto)) opciones.push(d)
+
+}
+
+opciones.sort(()=>Math.random()-0.5)
 while(opciones.length<6){
 
 let d=distractores[aleatorio(0,distractores.length-1)]

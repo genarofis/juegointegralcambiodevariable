@@ -2,158 +2,145 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Desafío de Cálculo: Integrales</title>
+    <title>Reto de Integrales Pro</title>
     <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; display: flex; flex-direction: column; align-items: center; padding: 40px; }
-        .card { background: white; padding: 40px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); text-align: center; min-width: 600px; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f4f7f9; display: flex; flex-direction: column; align-items: center; padding: 40px; }
+        .card { background: white; padding: 30px; border-radius: 15px; box-shadow: 0 8px 20px rgba(0,0,0,0.1); text-align: center; width: 100%; max-width: 700px; }
         
-        /* Huecos interactivos */
-        .hueco {
-            display: inline-block;
-            min-width: 70px;
-            height: 45px;
-            background: #e8f0fe;
-            border: 2px dashed #1a73e8;
-            border-radius: 8px;
-            cursor: pointer;
-            vertical-align: middle;
-            margin: 0 5px;
-            transition: all 0.2s;
-            line-height: 45px;
-            padding: 0 10px;
-            color: #1a73e8;
-        }
-        .hueco:hover { background: #d2e3fc; border-color: #0d47a1; }
-        .hueco.seleccionado { border-color: #fbbc04; background: #fff8e1; box-shadow: 0 0 10px #fbbc04; }
-        .hueco.relleno { border-style: solid; background: white; width: auto; }
-
-        .opciones-container { display: flex; gap: 12px; justify-content: center; margin-top: 30px; }
-        .opcion-btn {
-            padding: 10px 20px;
-            background: white;
-            border: 2px solid #1a73e8;
+        .display-integral { 
+            font-size: 3.5rem; 
+            margin: 30px 0; 
+            padding: 20px;
+            background: #fff;
             border-radius: 10px;
-            cursor: pointer;
-            font-size: 1.2rem;
-            color: #1a73e8;
-            transition: 0.3s;
+            min-height: 120px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
-        .opcion-btn:hover { background: #1a73e8; color: white; }
 
-        .integral-display { font-size: 3rem; margin: 40px 0; display: flex; align-items: center; justify-content: center; }
-        #score { font-size: 1.5rem; color: #1a73e8; margin-bottom: 20px; font-weight: bold; }
-        button.verificar { margin-top: 30px; padding: 12px 40px; background: #1a73e8; color: white; border: none; border-radius: 25px; cursor: pointer; font-size: 1.1rem; }
-        #mensaje { margin-top: 20px; font-weight: bold; height: 30px; }
+        .controles { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-top: 20px; }
+        
+        .btn-opcion { 
+            padding: 12px 20px; 
+            background: #fff; 
+            border: 2px solid #1a73e8; 
+            color: #1a73e8;
+            border-radius: 8px; 
+            cursor: pointer; 
+            font-size: 1.2rem;
+            transition: 0.2s;
+        }
+        .btn-opcion:hover { background: #e8f0fe; }
+        
+        .btn-reset { background: #f1f3f4; border: 1px solid #ccc; padding: 8px 15px; border-radius: 5px; cursor: pointer; margin-top: 10px; }
+        
+        .puntos { font-size: 1.5rem; font-weight: bold; color: #1a73e8; margin-bottom: 15px; }
+        .msg { margin-top: 20px; font-weight: bold; font-size: 1.2rem; height: 30px; }
+        
+        .instrucciones { color: #5f6368; margin-bottom: 20px; }
+        .verificar-btn { background: #1a73e8; color: white; border: none; padding: 15px 40px; border-radius: 30px; font-size: 1.1rem; cursor: pointer; margin-top: 20px; }
     </style>
 </head>
 <body>
 
-    <div id="score">Puntuación: 0</div>
+    <div class="puntos">Puntuación: <span id="score">0</span></div>
 
     <div class="card">
-        <h2>Completa la estructura de la integral</h2>
-        <p style="color: #666;">Haz clic en un cuadro azul y luego elige la función correcta</p>
+        <h2>Completa la Integral</h2>
+        <p class="instrucciones">Haz clic en los botones para rellenar los espacios $[\dots]$ en orden.</p>
         
-        <div class="integral-display" id="integral-box">
+        <div class="display-integral" id="math-box">
             </div>
 
-        <div class="opciones-container" id="opciones-box"></div>
+        <div class="controles" id="botones-opciones"></div>
         
-        <button class="verificar" onclick="comprobar()">Verificar</button>
-        <div id="mensaje"></div>
+        <button class="btn-reset" onclick="resetIntegral()">Borrar espacios</button>
+        <br>
+        <button class="verificar-btn" onclick="verificar()">Comprobar Resultado</button>
+        
+        <div id="msg" class="msg"></div>
     </div>
 
     <script>
-        let puntos = 0;
-        let idSeleccionado = null;
-        let config = { u: '', du: '', r1: null, r2: null };
+        let score = 0;
+        let actual = {};
+        let respuestas = []; // Guardará lo que el usuario elige
 
-        function generar() {
-            const n = Math.floor(Math.random() * 3) + 2;
-            const tipos = [
-                { // Exponencial
-                    u: `${n}x`, du: `${n}`,
-                    latex_pre: '\\int', latex_mid: '\\cdot e^{', latex_post: '} \\, dx'
-                },
-                { // Raíz
-                    u: `x^2`, du: `2x`,
-                    latex_pre: '\\int', latex_mid: '\\cdot \\sqrt{', latex_post: '} \\, dx'
-                },
-                { // Fracción
-                    u: `x^{${n}}`, du: `${n}x^{${n-1}}`,
-                    latex_pre: '\\int \\frac{', latex_mid: '}{', latex_post: '} \\, dx'
-                },
-                { // Trigonométrica
-                    u: `${n}x`, du: `${n}`,
-                    latex_pre: '\\int', latex_mid: '\\cdot \\cos(', latex_post: ') \\, dx'
-                }
-            ];
+        const EJERCICIOS = [
+            {
+                template: (r) => `\\int ${r[0] || '[\\dots]'} \\cdot e^{${r[1] || '[\\dots]'}} \\, dx`,
+                u: '3x', du: '3', ops: ['3', '3x', 'x', 'e^x']
+            },
+            {
+                template: (r) => `\\int ${r[0] || '[\\dots]'} \\cdot \\sqrt{${r[1] || '[\\dots]'}} \\, dx`,
+                u: 'x^2', du: '2x', ops: ['2x', 'x^2', 'x', '2']
+            },
+            {
+                template: (r) => `\\int \\frac{${r[0] || '[\\dots]'}}{${r[1] || '[\\dots]'}} \\, dx`,
+                u: 'x^3', du: '3x^2', ops: ['3x^2', 'x^3', 'x^2', '3']
+            },
+            {
+                template: (r) => `\\int ${r[0] || '[\\dots]'} \\cdot \\cos(${r[1] || '[\\dots]'}) \\, dx`,
+                u: '5x', du: '5', ops: ['5', '5x', 'x', '\\sin x']
+            }
+        ];
 
-            const t = tipos[Math.floor(Math.random() * tipos.length)];
-            config = { u: t.u, du: t.du, r1: null, r2: null };
-            idSeleccionado = null;
-
-            // Construcción manual para evitar que MathJax rompa los eventos
-            const area = document.getElementById('integral-box');
-            area.innerHTML = `
-                <span>\\(${t.latex_pre}\\)</span>
-                <div id="h1" class="hueco" onclick="seleccionar('h1')"></div>
-                <span>\\(${t.latex_mid}\\)</span>
-                <div id="h2" class="hueco" onclick="seleccionar('h2')"></div>
-                <span>\\(${t.latex_post}\\)</span>
-            `;
-
-            // Opciones
-            const lista = [t.u, t.du, 'x', '5'].sort(() => Math.random() - 0.5);
-            document.getElementById('opciones-box').innerHTML = lista.map(o => 
-                `<button class="opcion-btn" onclick="rellenar('${o}')">\\(${o}\\)</button>`
+        function nuevaIntegral() {
+            actual = EJERCICIOS[Math.floor(Math.random() * EJERCICIOS.length)];
+            respuestas = [];
+            render();
+            
+            // Mezclar opciones y crear botones
+            const botones = [...actual.ops].sort(() => Math.random() - 0.5);
+            document.getElementById('botones-opciones').innerHTML = botones.map(opt => 
+                `<button class="btn-opcion" onclick="elegir('${opt}')">\\(${opt}\\)</button>`
             ).join('');
-
-            MathJax.typeset();
+            
+            MathJax.typesetPromise();
         }
 
-        function seleccionar(id) {
-            document.querySelectorAll('.hueco').forEach(h => h.classList.remove('seleccionado'));
-            idSeleccionado = id;
-            document.getElementById(id).classList.add('seleccionado');
+        function elegir(valor) {
+            if (respuestas.length < 2) {
+                respuestas.push(valor);
+                render();
+            }
         }
 
-        function rellenar(valor) {
-            if (!idSeleccionado) {
-                alert("Primero haz clic en un cuadro azul de la integral");
+        function resetIntegral() {
+            respuestas = [];
+            render();
+        }
+
+        function render() {
+            const box = document.getElementById('math-box');
+            // Generamos el string de LaTeX puro usando la plantilla y las respuestas
+            const tex = actual.template(respuestas);
+            box.innerHTML = `\\[ ${tex} \\]`;
+            MathJax.typesetPromise([box]);
+        }
+
+        function verificar() {
+            const m = document.getElementById('msg');
+            if (respuestas.length < 2) {
+                m.innerHTML = "<span style='color:orange'>Rellena ambos espacios primero.</span>";
                 return;
             }
-            const el = document.getElementById(idSeleccionado);
-            el.innerHTML = `\\(${valor}\\)`;
-            el.classList.add('relleno');
-            el.classList.remove('seleccionado');
-            
-            if (idSeleccionado === 'h1') config.r1 = valor;
-            else config.r2 = valor;
-            
-            idSeleccionado = null;
-            MathJax.typesetPromise([el]);
-        }
 
-        function comprobar() {
-            const m = document.getElementById('mensaje');
-            // Verificamos si las respuestas coinciden con la lógica (u y du)
-            // Nota: Dependiendo del tipo, el orden puede variar. 
-            // En este script h2 es generalmente el argumento (u) y h1 el factor (du)
-            // excepto en la fracción donde h2 es denominador (u) y h1 numerador (du).
-            
-            if (config.r1 === config.du && config.r2 === config.u) {
-                puntos++;
-                document.getElementById('score').innerText = "Puntuación: " + puntos;
-                m.innerHTML = "<span style='color:green'>¡Correcto!</span>";
-                setTimeout(() => { m.innerText = ""; generar(); }, 1500);
+            // En la mayoría de mis plantillas: r[0] es du y r[1] es u
+            // Excepto en la fracción donde r[0] es du (arriba) y r[1] es u (abajo)
+            if (respuestas[0] === actual.du && respuestas[1] === actual.u) {
+                m.innerHTML = "<span style='color:green'>¡Correcto! +1 punto</span>";
+                score++;
+                document.getElementById('score').innerText = score;
+                setTimeout(() => { m.innerText = ""; nuevaIntegral(); }, 1500);
             } else {
                 m.innerHTML = "<span style='color:red'>Incorrecto. Revisa el cambio de variable.</span>";
             }
         }
 
-        window.onload = generar;
+        window.onload = nuevaIntegral;
     </script>
 </body>
 </html>

@@ -1,494 +1,310 @@
+```html
 <!DOCTYPE html>
 <html lang="es">
 
 <head>
-    <meta charset="UTF-8">
-    <title>Juego Cambio de Variable</title>
-    
-    <script>
-        window.MathJax = {
-            tex: {
-                inlineMath: [['$', '$'], ['\\(', '\\)']],
-                displayMath: [['$$', '$$'], ['\\[', '\\]']],
-                processEscapes: true
-            },
-            svg: {
-                fontCache: 'global'
-            }
-        };
-    </script>
-    
-    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
-    
-    <style>
-        body {
-            font-family: 'Segoe UI', Arial, sans-serif;
-            max-width: 900px;
-            margin: auto;
-            padding: 20px;
-            background: #f0f2f5;
-        }
-        
-        h1 {
-            text-align: center;
-            color: #1a73e8;
-        }
-        
-        .ejercicio {
-            background: white;
-            padding: 25px;
-            border-radius: 15px;
-            margin: 20px 0;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
-        
-        .integral {
-            font-size: 2em;
-            text-align: center;
-            padding: 25px;
-            background: #f8f9fa;
-            border-radius: 10px;
-            margin-bottom: 30px;
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            align-items: center;
-            gap: 5px;
-        }
-        
-        .integral-parte {
-            display: inline-flex;
-            align-items: center;
-        }
-        
-        .espacio-drop {
-            display: inline-block;
-            min-width: 100px;
-            height: 50px;
-            border: 3px dashed #1a73e8;
-            border-radius: 8px;
-            margin: 0 5px;
-            text-align: center;
-            line-height: 50px;
-            background: #e8f0fe;
-            font-size: 1.2em;
-            color: #1a73e8;
-            vertical-align: middle;
-        }
-        
-        .opciones-container {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 15px;
-            justify-content: center;
-            margin: 30px 0;
-            padding: 20px;
-            background: #f8f9fa;
-            border-radius: 10px;
-        }
-        
-        .opcion {
-            display: inline-block;
-            padding: 15px 25px;
-            background: white;
-            border: 2px solid #1a73e8;
-            border-radius: 8px;
-            cursor: grab;
-            font-size: 1.3em;
-            color: #1a73e8;
-            transition: all 0.3s;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        
-        .opcion:hover {
-            background: #1a73e8;
-            color: white;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-        }
-        
-        .opcion:active {
-            cursor: grabbing;
-        }
-        
-        .correcto {
-            color: #0f9d58;
-            font-weight: bold;
-            font-size: 1.3em;
-        }
-        
-        .incorrecto {
-            color: #d93025;
-            font-weight: bold;
-            font-size: 1.3em;
-        }
-        
-        .score-container {
-            text-align: center;
-            font-size: 1.3em;
-            margin: 20px 0;
-            padding: 15px;
-            background: white;
-            border-radius: 10px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        
-        #score {
-            font-weight: bold;
-            color: #1a73e8;
-            font-size: 1.5em;
-        }
-        
-        button {
-            display: block;
-            width: 200px;
-            margin: 20px auto;
-            padding: 15px 30px;
-            background: #1a73e8;
-            color: white;
-            border: none;
-            border-radius: 25px;
-            font-size: 1.1em;
-            cursor: pointer;
-            transition: all 0.3s;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-        }
-        
-        button:hover {
-            background: #0d47a1;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-        }
-        
-        #resultado {
-            text-align: center;
-            font-size: 1.3em;
-            min-height: 50px;
-            padding: 10px;
-        }
-        
-        .latex {
-            font-size: 1.2em;
-            margin: 0 5px;
-        }
-    </style>
+<meta charset="UTF-8">
+<title>Juego Cambio de Variable</title>
+
+<script>
+window.MathJax = {
+tex: {
+inlineMath: [['$', '$'], ['\\(', '\\)']],
+displayMath: [['$$', '$$'], ['\\[', '\\]']]
+}
+};
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+
+<style>
+
+body{
+font-family:Arial;
+max-width:900px;
+margin:auto;
+padding:20px;
+background:#f0f2f5;
+}
+
+h1{
+text-align:center;
+color:#1a73e8;
+}
+
+.integral{
+font-size:2em;
+text-align:center;
+margin:30px 0;
+}
+
+.dropzone{
+display:inline-block;
+min-width:90px;
+height:45px;
+border:3px dashed #1a73e8;
+border-radius:8px;
+line-height:45px;
+background:#e8f0fe;
+margin:5px;
+}
+
+.opciones{
+display:flex;
+flex-wrap:wrap;
+gap:15px;
+justify-content:center;
+margin-top:25px;
+}
+
+.opcion{
+padding:12px 20px;
+background:white;
+border:2px solid #1a73e8;
+border-radius:8px;
+cursor:grab;
+font-size:1.2em;
+}
+
+.opcion:hover{
+background:#1a73e8;
+color:white;
+}
+
+.correcto{color:green;font-size:1.2em}
+.incorrecto{color:red;font-size:1.2em}
+
+.score{
+text-align:center;
+font-size:1.4em;
+margin:20px;
+}
+
+button{
+display:block;
+margin:auto;
+padding:12px 25px;
+font-size:1.1em;
+background:#1a73e8;
+color:white;
+border:none;
+border-radius:20px;
+cursor:pointer;
+}
+
+button:hover{
+background:#0d47a1;
+}
+
+#resultado{
+text-align:center;
+margin-top:20px;
+font-size:1.3em;
+}
+
+</style>
+
 </head>
 
 <body>
-    <h1>🎮 Juego de Cambio de Variable</h1>
-    
-    <div class="score-container">
-        Puntuación: <span id="score">0</span>
-    </div>
-    
-    <div id="ejercicio"></div>
-    
-    <button onclick="verificar()">Verificar respuesta</button>
-    
-    <div id="resultado"></div>
 
-    <script>
-        let puntuacion = 0;
-        let ejercicioActual = null;
-        
-        function aleatorio(min, max) {
-            return Math.floor(Math.random() * (max - min + 1)) + min;
-        }
-        
-        function generarEjercicio() {
-            let tipo = aleatorio(1, 8);
-            let u, du, partes = [];
-            let posU, posDU;
-            
-            switch(tipo) {
-                case 1: // Potencia
-                    let n = aleatorio(2, 4);
-                    let p = aleatorio(2, 3);
-                    u = `x^{${n}}`;
-                    du = `${n}x^{${n-1}}`;
-                    posU = 1;
-                    posDU = 2;
-                    partes = [
-                        { tipo: 'latex', valor: '\\int (' },
-                        { tipo: 'drop', id: 'drop1' },
-                        { tipo: 'latex', valor: ')^{' + p + '} \\cdot ' },
-                        { tipo: 'drop', id: 'drop2' },
-                        { tipo: 'latex', valor: ' dx' }
-                    ];
-                    break;
+<h1>Juego de Cambio de Variable</h1>
 
-case 2: // Exponencial
-                    let a = aleatorio(2, 4);
-                    u = `${a}x`;
-                    du = `${a}`;
-                    posU = 2; // exponente
-                    posDU = 1; // multiplicando
-                    latex = `
-\\int
-\\htmlClass{drop}{\\square}
-\\cdot
-e^{\\htmlClass{drop}{\\square}}
-dx
-`;
-                    break;
+<div class="score">
+Puntuación: <span id="score">0</span>
+</div>
 
-                case 6: // Logaritmo (Fracción)
-                    u = `\\ln x`;
-                    du = `\\frac{1}{x}`;
-                    posU = 2; // denominador
-                    posDU = 1; // numerador
-                    // Solución: Construimos la fracción con CSS (flexbox) para no romper MathJax
-                    integralHTML = `
-                        \\(\\int \\)
-                        <div style="display: inline-flex; flex-direction: column; align-items: center; vertical-align: middle; margin: 0 10px;">
-                            <span class="espacio-drop" id="drop1" ondrop="drop(event)" ondragover="allowDrop(event)" style="margin: 0 0 5px 0; min-height: 40px;"></span>
-                            <div style="border-bottom: 2px solid #000; width: 100%;"></div>
-                            <span class="espacio-drop" id="drop2" ondrop="drop(event)" ondragover="allowDrop(event)" style="margin: 5px 0 0 0; min-height: 40px;"></span>
-                        </div>
-                        \\( dx\\)
-                    `;
-                    break;
+<div id="ejercicio"></div>
 
-                case 7: // Raíz
-                    let m = aleatorio(2, 3);
-                    u = `x^{${m}}`;
-                    du = `${m}x^{${m-1}}`;
-                    posU = 2; // dentro de la raíz
-                    posDU = 1; // multiplicando
-                    // Solución: Matemáticamente, una raíz es una potencia fraccionaria. 
-                    // Usar paréntesis en lugar del símbolo de raíz evita fallos gráficos con las cajas HTML.
-                    integralHTML = `
-                        \\(\\int \\)
-                        <span class="espacio-drop" id="drop1" ondrop="drop(event)" ondragover="allowDrop(event)"></span>
-                        \\( \\cdot ( \\)
-                        <span class="espacio-drop" id="drop2" ondrop="drop(event)" ondragover="allowDrop(event)"></span>
-                        \\( )^{1/${m}} \\, dx\\)
-                    `;
-                    break;
-                    
-                case 3: // Seno
-                    let b = aleatorio(2, 4);
-                    u = `${b}x`;
-                    du = `${b}`;
-                    posU = 2;
-                    posDU = 1;
-                    partes = [
-                        { tipo: 'latex', valor: '\\int ' },
-                        { tipo: 'drop', id: 'drop1' },
-                        { tipo: 'latex', valor: ' \\cdot \\sin(' },
-                        { tipo: 'drop', id: 'drop2' },
-                        { tipo: 'latex', valor: ') dx' }
-                    ];
-                    break;
-                    
-                case 4: // Coseno
-                    let c = aleatorio(2, 4);
-                    u = `${c}x`;
-                    du = `${c}`;
-                    posU = 2;
-                    posDU = 1;
-                    partes = [
-                        { tipo: 'latex', valor: '\\int ' },
-                        { tipo: 'drop', id: 'drop1' },
-                        { tipo: 'latex', valor: ' \\cdot \\cos(' },
-                        { tipo: 'drop', id: 'drop2' },
-                        { tipo: 'latex', valor: ') dx' }
-                    ];
-                    break;
-                    
-                case 5: // Sec^2
-                    let e = aleatorio(2, 4);
-                    u = `${e}x`;
-                    du = `${e}`;
-                    posU = 2;
-                    posDU = 1;
-                    partes = [
-                        { tipo: 'latex', valor: '\\int ' },
-                        { tipo: 'drop', id: 'drop1' },
-                        { tipo: 'latex', valor: ' \\cdot \\sec^2(' },
-                        { tipo: 'drop', id: 'drop2' },
-                        { tipo: 'latex', valor: ') dx' }
-                    ];
-                    break;
-                    
-                case 6: // Logaritmo
-                    u = `\\ln x`;
-                    du = `\\frac{1}{x}`;
-                    posU = 2;
-                    posDU = 1;
-                    partes = [
-                        { tipo: 'latex', valor: '\\int \\frac{' },
-                        { tipo: 'drop', id: 'drop1' },
-                        { tipo: 'latex', valor: '}{' },
-                        { tipo: 'drop', id: 'drop2' },
-                        { tipo: 'latex', valor: '} dx' }
-                    ];
-                    break;
-  
-                case 8: // Csc^2
-                    let f = aleatorio(2, 4);
-                    u = `${f}x`;
-                    du = `${f}`;
-                    posU = 2;
-                    posDU = 1;
-                    partes = [
-                        { tipo: 'latex', valor: '\\int ' },
-                        { tipo: 'drop', id: 'drop1' },
-                        { tipo: 'latex', valor: ' \\cdot \\csc^2(' },
-                        { tipo: 'drop', id: 'drop2' },
-                        { tipo: 'latex', valor: ') dx' }
-                    ];
-                    break;
-            }
-            
-            // Crear 4 opciones: u, du, y 2 distractores
-            let distractores = [
-                'x^2', '2x', 'x^3', '3x^2', '5', '5x', 
-                '\\sin x', '\\cos x', 'e^x', '\\ln x', '\\frac{1}{x}',
-                '\\sec^2 x', '\\tan x'
-            ];
-            
-            // Filtrar para que no coincidan con u y du
-            distractores = distractores.filter(d => d !== u && d !== du);
-            
-            // Seleccionar 2 distractores aleatorios
-            let d1 = distractores[aleatorio(0, distractores.length - 1)];
-            let d2;
-            do {
-                d2 = distractores[aleatorio(0, distractores.length - 1)];
-            } while (d2 === d1);
-            
-            let opciones = [u, du, d1, d2];
-            
-            // Mezclar opciones
-            opciones.sort(() => Math.random() - 0.5);
-            
-            ejercicioActual = {
-                u: u,
-                du: du,
-                posU: posU,
-                posDU: posDU,
-                partes: partes,
-                opciones: opciones,
-                respuestas: { drop1: null, drop2: null }
-            };
-            
-            dibujar();
-        }
-        function dibujar(){
+<button onclick="verificar()">Verificar</button>
+
+<div id="resultado"></div>
+
+<script>
+
+let puntuacion=0
+let ejercicioActual=null
+
+function aleatorio(min,max){
+return Math.floor(Math.random()*(max-min+1))+min
+}
+
+function generarEjercicio(){
+
+let tipo=aleatorio(1,5)
+
+let u,du,latex
+
+switch(tipo){
+
+case 1:
+
+let n=aleatorio(2,4)
+let p=aleatorio(2,3)
+
+u=`x^{${n}}`
+du=`${n}x^{${n-1}}`
+
+latex=`\\int (\\boxed{\\phantom{aaa}})^{${p}}\\cdot \\boxed{\\phantom{aaa}} dx`
+
+break
+
+case 2:
+
+let a=aleatorio(2,4)
+
+u=`${a}x`
+du=`${a}`
+
+latex=`\\int \\boxed{\\phantom{aaa}}\\cdot e^{\\boxed{\\phantom{aaa}}} dx`
+
+break
+
+case 3:
+
+let b=aleatorio(2,4)
+
+u=`${b}x`
+du=`${b}`
+
+latex=`\\int \\boxed{\\phantom{aaa}}\\cdot \\sin(\\boxed{\\phantom{aaa}}) dx`
+
+break
+
+case 4:
+
+let c=aleatorio(2,4)
+
+u=`${c}x`
+du=`${c}`
+
+latex=`\\int \\boxed{\\phantom{aaa}}\\cdot \\cos(\\boxed{\\phantom{aaa}}) dx`
+
+break
+
+case 5:
+
+u=`\\ln x`
+du=`\\frac{1}{x}`
+
+latex=`\\int \\frac{\\boxed{\\phantom{aaa}}}{\\boxed{\\phantom{aaa}}} dx`
+
+break
+
+}
+
+let distractores=[
+"x^2","2x","x^3","3x^2","5","5x",
+"\\sin x","\\cos x","e^x","\\ln x"
+]
+
+distractores=distractores.filter(d=>d!=u && d!=du)
+
+let d1=distractores[aleatorio(0,distractores.length-1)]
+let d2=distractores[aleatorio(0,distractores.length-1)]
+
+let opciones=[u,du,d1,d2]
+
+opciones.sort(()=>Math.random()-0.5)
+
+ejercicioActual={u,du,latex,opciones,respuestas:{}}
+
+dibujar()
+
+}
+
+function dibujar(){
 
 let html=""
 
-html+=`<div class="ejercicio">`
+html+=`<div class="integral">\\[${ejercicioActual.latex}\\]</div>`
 
-html+=`
-<div class="integral">
-\\[
-${ejercicioActual.latex}
-\\]
-</div>
-`
+html+=`<div id="drops"></div>`
 
-html+=`<div class="opciones-container">`
+html+=`<div class="opciones">`
 
-ejercicioActual.opciones.forEach(opcion=>{
+ejercicioActual.opciones.forEach(op=>{
 
-html+=`
-<div class="opcion"
+html+=`<div class="opcion"
 draggable="true"
 ondragstart="drag(event)"
-data-value="${opcion}">
-\\(${opcion}\\)
-</div>
-`
+data-value="${op}">
+\\(${op}\\)
+</div>`
 
 })
 
-html+=`</div></div>`
+html+=`</div>`
 
 document.getElementById("ejercicio").innerHTML=html
 
 MathJax.typesetPromise().then(()=>{
 
-let drops=document.querySelectorAll(".drop")
-
-drops[0].id="drop1"
-drops[1].id="drop2"
-
-drops.forEach(d=>{
-
-d.classList.add("espacio-drop")
-
-d.ondrop=drop
-d.ondragover=allowDrop
-
-})
+let boxes=document.querySelectorAll("mjx-box")
 
 })
 
 }
-        
-        function allowDrop(ev) {
-            ev.preventDefault();
-        }
-        
-        function drag(ev) {
-            let valor = ev.target.getAttribute('data-value');
-            ev.dataTransfer.setData("text/plain", valor);
-        }
-        
-        function drop(ev) {
-            ev.preventDefault();
-            let data = ev.dataTransfer.getData("text/plain");
-            let targetId = ev.target.id;
-            
-            if (data && targetId) {
-                ev.target.innerHTML = `\\(${data}\\)`;
-                ev.target.setAttribute("data-value", data);
-                
-                // Guardar respuesta
-                ejercicioActual.respuestas[targetId] = data;
-                
-                if (window.MathJax) {
-                    MathJax.typesetPromise([ev.target]);
-                }
-            }
-        }
-        
-        function verificar() {
-            let resp1 = ejercicioActual.respuestas.drop1;
-            let resp2 = ejercicioActual.respuestas.drop2;
-            
-            if (!resp1 || !resp2) {
-                document.getElementById("resultado").innerHTML = "<span class='incorrecto'>❓ Debes llenar ambos espacios</span>";
-                return;
-            }
-            
-            let correcto = false;
-            
-            // Verificar ambas combinaciones posibles
-            if (ejercicioActual.posU === 1 && ejercicioActual.posDU === 2) {
-                correcto = (resp1 === ejercicioActual.u && resp2 === ejercicioActual.du);
-            } else if (ejercicioActual.posU === 2 && ejercicioActual.posDU === 1) {
-                correcto = (resp1 === ejercicioActual.du && resp2 === ejercicioActual.u);
-            }
-            
-            if (correcto) {
-                document.getElementById("resultado").innerHTML = "<span class='correcto'>✅ ¡Muy bien! +1 punto</span>";
-                puntuacion++;
-                document.getElementById("score").innerText = puntuacion;
-                
-                setTimeout(() => {
-                    generarEjercicio();
-                    document.getElementById("resultado").innerHTML = "";
-                }, 1500);
-            } else {
-                document.getElementById("resultado").innerHTML = "<span class='incorrecto'>❌ Intenta otra vez</span>";
-            }
-        }
-        
-        generarEjercicio();
-    </script>
-</body>
 
+function drag(ev){
+
+ev.dataTransfer.setData("text",ev.target.dataset.value)
+
+}
+
+function allowDrop(ev){
+ev.preventDefault()
+}
+
+function drop(ev){
+
+ev.preventDefault()
+
+let data=ev.dataTransfer.getData("text")
+
+ev.target.innerHTML="\\("+data+"\\)"
+
+ev.target.dataset.value=data
+
+MathJax.typesetPromise([ev.target])
+
+}
+
+function verificar(){
+
+let drops=document.querySelectorAll(".dropzone")
+
+if(drops.length<2)return
+
+let r1=drops[0].dataset.value
+let r2=drops[1].dataset.value
+
+let correcto=(r1==ejercicioActual.u && r2==ejercicioActual.du)
+
+if(correcto){
+
+document.getElementById("resultado").innerHTML="<span class='correcto'>Muy bien</span>"
+
+puntuacion++
+document.getElementById("score").innerText=puntuacion
+
+setTimeout(()=>{
+generarEjercicio()
+document.getElementById("resultado").innerHTML=""
+},1200)
+
+}else{
+
+document.getElementById("resultado").innerHTML="<span class='incorrecto'>Intenta otra vez</span>"
+
+}
+
+}
+
+generarEjercicio()
+
+</script>
+
+</body>
 </html>
+```

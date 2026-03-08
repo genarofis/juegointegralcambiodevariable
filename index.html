@@ -3,14 +3,14 @@
 <html lang="es">
 
 <head>
+
 <meta charset="UTF-8">
 <title>Juego Cambio de Variable</title>
 
 <script>
 window.MathJax = {
 tex: {
-inlineMath: [['$', '$'], ['\\(', '\\)']],
-displayMath: [['$$', '$$'], ['\\[', '\\]']]
+inlineMath: [['$', '$'], ['\\(', '\\)']]
 }
 };
 </script>
@@ -40,13 +40,14 @@ margin:30px 0;
 
 .dropzone{
 display:inline-block;
-min-width:90px;
-height:45px;
+min-width:110px;
+height:50px;
 border:3px dashed #1a73e8;
 border-radius:8px;
-line-height:45px;
-background:#e8f0fe;
 margin:5px;
+line-height:50px;
+background:#e8f0fe;
+vertical-align:middle;
 }
 
 .opciones{
@@ -54,7 +55,7 @@ display:flex;
 flex-wrap:wrap;
 gap:15px;
 justify-content:center;
-margin-top:25px;
+margin-top:30px;
 }
 
 .opcion{
@@ -71,8 +72,8 @@ background:#1a73e8;
 color:white;
 }
 
-.correcto{color:green;font-size:1.2em}
-.incorrecto{color:red;font-size:1.2em}
+.correcto{color:green;font-size:1.3em}
+.incorrecto{color:red;font-size:1.3em}
 
 .score{
 text-align:center;
@@ -90,10 +91,6 @@ color:white;
 border:none;
 border-radius:20px;
 cursor:pointer;
-}
-
-button:hover{
-background:#0d47a1;
 }
 
 #resultado{
@@ -133,7 +130,8 @@ function generarEjercicio(){
 
 let tipo=aleatorio(1,5)
 
-let u,du,latex
+let u,du
+let estructura=[]
 
 switch(tipo){
 
@@ -145,7 +143,13 @@ let p=aleatorio(2,3)
 u=`x^{${n}}`
 du=`${n}x^{${n-1}}`
 
-latex=`\\int (\\boxed{\\phantom{aaa}})^{${p}}\\cdot \\boxed{\\phantom{aaa}} dx`
+estructura=[
+"\\int (",
+"drop1",
+`)^{${p}} \\cdot `,
+"drop2",
+" dx"
+]
 
 break
 
@@ -156,7 +160,13 @@ let a=aleatorio(2,4)
 u=`${a}x`
 du=`${a}`
 
-latex=`\\int \\boxed{\\phantom{aaa}}\\cdot e^{\\boxed{\\phantom{aaa}}} dx`
+estructura=[
+"\\int ",
+"drop1",
+" \\cdot e^{",
+"drop2",
+"} dx"
+]
 
 break
 
@@ -167,7 +177,13 @@ let b=aleatorio(2,4)
 u=`${b}x`
 du=`${b}`
 
-latex=`\\int \\boxed{\\phantom{aaa}}\\cdot \\sin(\\boxed{\\phantom{aaa}}) dx`
+estructura=[
+"\\int ",
+"drop1",
+" \\cdot \\sin(",
+"drop2",
+") dx"
+]
 
 break
 
@@ -178,16 +194,28 @@ let c=aleatorio(2,4)
 u=`${c}x`
 du=`${c}`
 
-latex=`\\int \\boxed{\\phantom{aaa}}\\cdot \\cos(\\boxed{\\phantom{aaa}}) dx`
+estructura=[
+"\\int ",
+"drop1",
+" \\cdot \\cos(",
+"drop2",
+") dx"
+]
 
 break
 
 case 5:
 
-u=`\\ln x`
-du=`\\frac{1}{x}`
+u="\\ln x"
+du="\\frac{1}{x}"
 
-latex=`\\int \\frac{\\boxed{\\phantom{aaa}}}{\\boxed{\\phantom{aaa}}} dx`
+estructura=[
+"\\int \\frac{",
+"drop1",
+"}{",
+"drop2",
+"} dx"
+]
 
 break
 
@@ -195,7 +223,7 @@ break
 
 let distractores=[
 "x^2","2x","x^3","3x^2","5","5x",
-"\\sin x","\\cos x","e^x","\\ln x"
+"\\sin x","\\cos x","e^x"
 ]
 
 distractores=distractores.filter(d=>d!=u && d!=du)
@@ -207,7 +235,7 @@ let opciones=[u,du,d1,d2]
 
 opciones.sort(()=>Math.random()-0.5)
 
-ejercicioActual={u,du,latex,opciones,respuestas:{}}
+ejercicioActual={u,du,estructura,opciones,respuestas:{}}
 
 dibujar()
 
@@ -215,34 +243,44 @@ dibujar()
 
 function dibujar(){
 
-let html=""
+let html="<div class='integral'>"
 
-html+=`<div class="integral">\\[${ejercicioActual.latex}\\]</div>`
+ejercicioActual.estructura.forEach(parte=>{
 
-html+=`<div id="drops"></div>`
+if(parte=="drop1" || parte=="drop2"){
 
-html+=`<div class="opciones">`
+html+=`<span class="dropzone" id="${parte}" ondrop="drop(event)" ondragover="allowDrop(event)"></span>`
+
+}else{
+
+html+=`\\(${parte}\\)`
+
+}
+
+})
+
+html+="</div>"
+
+html+="<div class='opciones'>"
 
 ejercicioActual.opciones.forEach(op=>{
 
-html+=`<div class="opcion"
+html+=`
+<div class="opcion"
 draggable="true"
 ondragstart="drag(event)"
 data-value="${op}">
 \\(${op}\\)
-</div>`
+</div>
+`
 
 })
 
-html+=`</div>`
+html+="</div>"
 
 document.getElementById("ejercicio").innerHTML=html
 
-MathJax.typesetPromise().then(()=>{
-
-let boxes=document.querySelectorAll("mjx-box")
-
-})
+MathJax.typesetPromise()
 
 }
 
@@ -272,12 +310,15 @@ MathJax.typesetPromise([ev.target])
 
 function verificar(){
 
-let drops=document.querySelectorAll(".dropzone")
+let r1=document.getElementById("drop1").dataset.value
+let r2=document.getElementById("drop2").dataset.value
 
-if(drops.length<2)return
+if(!r1 || !r2){
 
-let r1=drops[0].dataset.value
-let r2=drops[1].dataset.value
+document.getElementById("resultado").innerHTML="<span class='incorrecto'>Debes llenar ambos espacios</span>"
+return
+
+}
 
 let correcto=(r1==ejercicioActual.u && r2==ejercicioActual.du)
 

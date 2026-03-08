@@ -194,7 +194,7 @@
                     posU = 1; // posición dentro del paréntesis
                     posDU = 2; // posición multiplicando
                     integralHTML = `
-                        \\(\\int (\\) 
+                        \\(\\int (\\)
                         <span class="espacio-drop" id="drop1" ondrop="drop(event)" ondragover="allowDrop(event)"></span>
                         \\( )^{${p}} \\cdot \\)
                         <span class="espacio-drop" id="drop2" ondrop="drop(event)" ondragover="allowDrop(event)"></span>
@@ -202,7 +202,7 @@
                     `;
                     break;
                     
-                case 2: // Exponencial
+                case 2: // Exponencial - CORREGIDO
                     let a = aleatorio(2, 4);
                     u = `${a}x`;
                     du = `${a}`;
@@ -211,7 +211,7 @@
                     integralHTML = `
                         \\(\\int \\)
                         <span class="espacio-drop" id="drop1" ondrop="drop(event)" ondragover="allowDrop(event)"></span>
-                        \\( \\cdot e^{\\, \\)
+                        \\( \\cdot e^{ \\)
                         <span class="espacio-drop" id="drop2" ondrop="drop(event)" ondragover="allowDrop(event)"></span>
                         \\( } \\, dx\\)
                     `;
@@ -226,7 +226,7 @@
                     integralHTML = `
                         \\(\\int \\)
                         <span class="espacio-drop" id="drop1" ondrop="drop(event)" ondragover="allowDrop(event)"></span>
-                        \\( \\cdot \\sin(\\) 
+                        \\( \\cdot \\sin(\\)
                         <span class="espacio-drop" id="drop2" ondrop="drop(event)" ondragover="allowDrop(event)"></span>
                         \\( ) \\, dx\\)
                     `;
@@ -241,7 +241,7 @@
                     integralHTML = `
                         \\(\\int \\)
                         <span class="espacio-drop" id="drop1" ondrop="drop(event)" ondragover="allowDrop(event)"></span>
-                        \\( \\cdot \\cos(\\) 
+                        \\( \\cdot \\cos(\\)
                         <span class="espacio-drop" id="drop2" ondrop="drop(event)" ondragover="allowDrop(event)"></span>
                         \\( ) \\, dx\\)
                     `;
@@ -256,7 +256,7 @@
                     integralHTML = `
                         \\(\\int \\)
                         <span class="espacio-drop" id="drop1" ondrop="drop(event)" ondragover="allowDrop(event)"></span>
-                        \\( \\cdot \\sec^2(\\) 
+                        \\( \\cdot \\sec^2(\\)
                         <span class="espacio-drop" id="drop2" ondrop="drop(event)" ondragover="allowDrop(event)"></span>
                         \\( ) \\, dx\\)
                     `;
@@ -300,7 +300,7 @@
                     integralHTML = `
                         \\(\\int \\)
                         <span class="espacio-drop" id="drop1" ondrop="drop(event)" ondragover="allowDrop(event)"></span>
-                        \\( \\cdot \\csc^2(\\) 
+                        \\( \\cdot \\csc^2(\\)
                         <span class="espacio-drop" id="drop2" ondrop="drop(event)" ondragover="allowDrop(event)"></span>
                         \\( ) \\, dx\\)
                     `;

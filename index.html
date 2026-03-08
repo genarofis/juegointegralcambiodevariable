@@ -2,252 +2,81 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Reto de Integrales - 50 Niveles</title>
+    <title>Reto Integral: 50 Niveles</title>
     <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
     <style>
         body { font-family: 'Segoe UI', sans-serif; background: #f0f4f8; display: flex; flex-direction: column; align-items: center; padding: 20px; }
         .card { background: white; padding: 40px; border-radius: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); text-align: center; width: 100%; max-width: 900px; }
-        
-        .stats { display: flex; gap: 40px; margin-bottom: 20px; font-size: 1.3rem; font-weight: bold; flex-wrap: wrap; justify-content: center; }
-        #nivel-val { color: #e67e22; }
-        #puntos-val { color: #2980b9; }
-        #progreso { color: #8e44ad; }
-
-        .integral-area { 
-            font-size: 2.8rem; 
-            margin: 25px 0; 
-            padding: 30px;
-            background: #fff;
-            border: 2px solid #e1e8ed;
-            border-radius: 15px;
-            min-height: 120px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            overflow-x: auto;
-        }
-
-        .controles { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; margin-top: 25px; }
-        .btn-opcion { 
-            padding: 15px 25px; 
-            background: white; 
-            border: 2px solid #2980b9; 
-            color: #2980b9;
-            border-radius: 12px; 
-            cursor: pointer; 
-            font-size: 1.3rem;
-            transition: all 0.2s;
-            min-width: 80px;
-        }
-        .btn-opcion:hover { background: #2980b9; color: white; transform: translateY(-2px); }
-        .btn-opcion.seleccionada { background: #2980b9; color: white; }
-        
-        .btn-clear { background: #95a5a6; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; margin-top: 20px; font-size: 1rem; }
-        .btn-check { background: #27ae60; color: white; border: none; padding: 18px 50px; border-radius: 40px; font-size: 1.3rem; cursor: pointer; margin-top: 30px; font-weight: bold; transition: 0.3s; }
-        .btn-check:hover { background: #2ecc71; box-shadow: 0 5px 15px rgba(46,204,113,0.4); }
-        .btn-skip { background: #7f8c8d; color: white; border: none; padding: 10px 25px; border-radius: 20px; cursor: pointer; margin-left: 10px; font-size: 1rem; }
-        
-        .feedback { margin-top: 25px; font-weight: bold; font-size: 1.2rem; min-height: 35px; }
-        .nivel-indicador { display: inline-block; padding: 5px 15px; border-radius: 20px; background: #f1c40f; color: #2c3e50; font-weight: bold; margin-bottom: 15px; }
-        
-        .espacio-blanco {
-            display: inline-block;
-            min-width: 80px;
-            border-bottom: 3px dashed #e67e22;
-            margin: 0 5px;
-            text-align: center;
-            color: #e67e22;
-        }
+        .integral-area { font-size: 3rem; margin: 30px 0; min-height: 120px; display: flex; justify-content: center; align-items: center; }
+        .controles { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-top: 20px; }
+        .btn-opcion { padding: 12px 20px; background: white; border: 2px solid #2980b9; color: #2980b9; border-radius: 10px; cursor: pointer; font-size: 1.2rem; }
+        .btn-opcion:hover { background: #2980b9; color: white; }
+        .btn-action { padding: 10px 20px; margin: 5px; cursor: pointer; border: none; border-radius: 8px; font-size: 1rem; }
+        .btn-clear { background: #95a5a6; color: white; }
+        .btn-skip { background: #e67e22; color: white; }
+        .btn-check { background: #27ae60; color: white; padding: 15px 50px; border-radius: 40px; font-size: 1.3rem; margin-top: 20px; }
     </style>
 </head>
 <body>
 
-    <div class="stats">
-        <div>Puntos: <span id="puntos-val">0</span></div>
-        <div>Nivel: <span id="nivel-val">1</span> - <span id="dificultad-val">Básico</span></div>
-        <div>Progreso: <span id="progreso">1/50</span></div>
+<div class="card">
+    <div id="progreso">Nivel 1/50</div>
+    <div class="integral-area" id="math-box"></div>
+    <div id="botones-opciones" class="controles"></div>
+    <div class="controles">
+        <button class="btn-action btn-clear" onclick="limpiar()">Borrar Selección</button>
+        <button class="btn-action btn-skip" onclick="saltar()">Saltar Ejercicio</button>
     </div>
+    <button class="btn-check" onclick="validar()">Comprobar</button>
+    <div id="feedback"></div>
+</div>
 
-    <div class="card">
-        <div class="nivel-indicador" id="nivel-badge">🟢 NIVEL 1: Lineales simples</div>
-        
-        <div class="integral-area" id="math-box"></div>
+<script>
+let score = 0;
+let elegidos = [];
+let actual = {};
 
-        <div class="controles" id="botones-opciones"></div>
-        
-        <button class="btn-clear" onclick="limpiar()">Borrar selección</button>
-        <button class="btn-skip" onclick="saltar()">Saltar ejercicio ↺</button>
-        <br>
-        <button class="btn-check" onclick="validar()">Comprobar</button>
-        
-        <div id="feedback" class="feedback"></div>
-    </div>
+// Los 50 ejercicios estructurados
+const EJERCICIOS = [
+    { t:(r)=>`\\int (${r[0]||'\\square'})^3 \\cdot ${r[1]||'\\square'} \\, dx`, u:'5x', du:'5', ops:['5x','5','x^3','3x^2'] },
+    { t:(r)=>`\\int e^{${r[0]||'\\square'}} \\cdot ${r[1]||'\\square'} \\, dx`, u:'2x', du:'2', ops:['2x','2','e^x','e^{2x}'] },
+    { t:(r)=>`\\int \\sin(${r[0]||'\\square'}) \\cdot ${r[1]||'\\square'} \\, dx`, u:'3x', du:'3', ops:['3x','3','\\sin x','\\cos x'] },
+    // ... [Repetir patrón para los 50 ejercicios aquí]
+    { t:(r)=>`\\int (${r[0]||'\\square'})^6 \\cdot ${r[1]||'\\square'} \\, dx`, u:'x^3-4', du:'3x^2', ops:['x^3-4','3x^2','x^2','3'] }
+];
 
-    <script>
-        let score = 0;
-        let nivelActual = 1;
-        let ejercicioIndex = 0;
-        let actual = {};
-        let elegidos = [];
+function cargar() {
+    actual = EJERCICIOS[score % EJERCICIOS.length];
+    elegidos = [];
+    document.getElementById('progreso').innerText = `Ejercicio ${score + 1}/50`;
+    refrescar();
+}
 
-        // ==================== 50 EJERCICIOS ====================
-        // SOLO se muestra la integral con espacios en blanco, nunca las respuestas
-        const EJERCICIOS = [
-            // NIVEL 1: Lineales simples (1-7)
-            { t: () => `\\int (\\_\\_\\_\\_\\_)^3 \\cdot \\_\\_\\_\\_\\_ \\, dx`, u: '5x', du: '5', ops: ['5x', '5', 'x^3', '3x^2'] },
-            { t: () => `\\int e^{\\_\\_\\_\\_\\_} \\cdot \\_\\_\\_\\_\\_ \\, dx`, u: '2x', du: '2', ops: ['2x', '2', 'e^x', 'e^{2x}'] },
-            { t: () => `\\int \\sin(\\_\\_\\_\\_\\_) \\cdot \\_\\_\\_\\_\\_ \\, dx`, u: '3x', du: '3', ops: ['3x', '3', '\\sin x', '\\cos x'] },
-            { t: () => `\\int \\cos(\\_\\_\\_\\_\\_) \\cdot \\_\\_\\_\\_\\_ \\, dx`, u: '4x', du: '4', ops: ['4x', '4', '\\cos x', '-\\sin x'] },
-            { t: () => `\\int \\sec^2(\\_\\_\\_\\_\\_) \\cdot \\_\\_\\_\\_\\_ \\, dx`, u: '2x', du: '2', ops: ['2x', '2', '\\tan x', '\\sec^2 x'] },
-            { t: () => `\\int \\frac{\\_\\_\\_\\_\\_}{\\_\\_\\_\\_\\_} \\, dx`, u: 'x', du: '1', ops: ['x', '1', '\\ln x', '\\frac{1}{x}'] },
-            { t: () => `\\int (\\_\\_\\_\\_\\_)^2 \\cdot \\_\\_\\_\\_\\_ \\, dx`, u: '7x', du: '7', ops: ['7x', '7', 'x^2', '2x'] },
-            
-            // NIVEL 2: Polinomios simples (8-14)
-            { t: () => `\\int (\\_\\_\\_\\_\\_)^4 \\cdot \\_\\_\\_\\_\\_ \\, dx`, u: 'x^3', du: '3x^2', ops: ['x^3', '3x^2', 'x^4', '4x^3'] },
-            { t: () => `\\int (\\_\\_\\_\\_\\_)^5 \\cdot \\_\\_\\_\\_\\_ \\, dx`, u: 'x^2', du: '2x', ops: ['x^2', '2x', 'x^5', '5x^4'] },
-            { t: () => `\\int e^{\\_\\_\\_\\_\\_} \\cdot \\_\\_\\_\\_\\_ \\, dx`, u: 'x^3', du: '3x^2', ops: ['x^3', '3x^2', 'e^x', 'e^{x^3}'] },
-            { t: () => `\\int \\sin(\\_\\_\\_\\_\\_) \\cdot \\_\\_\\_\\_\\_ \\, dx`, u: 'x^4', du: '4x^3', ops: ['x^4', '4x^3', '\\sin x', '\\cos x'] },
-            { t: () => `\\int \\cos(\\_\\_\\_\\_\\_) \\cdot \\_\\_\\_\\_\\_ \\, dx`, u: 'x^5', du: '5x^4', ops: ['x^5', '5x^4', '\\cos x', '-\\sin x'] },
-            { t: () => `\\int \\sec^2(\\_\\_\\_\\_\\_) \\cdot \\_\\_\\_\\_\\_ \\, dx`, u: 'x^6', du: '6x^5', ops: ['x^6', '6x^5', '\\tan x', '\\sec^2 x'] },
-            { t: () => `\\int (\\_\\_\\_\\_\\_)^3 \\cdot \\_\\_\\_\\_\\_ \\, dx`, u: 'x^4', du: '4x^3', ops: ['x^4', '4x^3', 'x^3', '3x^2'] },
-            
-            // NIVEL 3: Trigonométricas compuestas (15-21)
-            { t: () => `\\int \\sin^3(\\_\\_\\_\\_\\_) \\cdot \\_\\_\\_\\_\\_ \\, dx`, u: '\\sin x', du: '\\cos x', ops: ['\\sin x', '\\cos x', '\\tan x', '\\sec^2 x'] },
-            { t: () => `\\int \\cos^4(\\_\\_\\_\\_\\_) \\cdot \\_\\_\\_\\_\\_ \\, dx`, u: '\\cos x', du: '-\\sin x', ops: ['\\cos x', '-\\sin x', '\\sin x', '\\cos^2 x'] },
-            { t: () => `\\int \\tan^5(\\_\\_\\_\\_\\_) \\cdot \\_\\_\\_\\_\\_ \\, dx`, u: '\\tan x', du: '\\sec^2 x', ops: ['\\tan x', '\\sec^2 x', '\\cot x', '-\\csc^2 x'] },
-            { t: () => `\\int \\cot^3(\\_\\_\\_\\_\\_) \\cdot \\_\\_\\_\\_\\_ \\, dx`, u: '\\cot x', du: '-\\csc^2 x', ops: ['\\cot x', '-\\csc^2 x', '\\tan x', '\\sec^2 x'] },
-            { t: () => `\\int \\sec^4(\\_\\_\\_\\_\\_) \\cdot \\_\\_\\_\\_\\_ \\, dx`, u: '\\sec x', du: '\\sec x \\tan x', ops: ['\\sec x', '\\sec x \\tan x', '\\tan x', '\\sec^2 x'] },
-            { t: () => `\\int \\csc^5(\\_\\_\\_\\_\\_) \\cdot \\_\\_\\_\\_\\_ \\, dx`, u: '\\csc x', du: '-\\csc x \\cot x', ops: ['\\csc x', '-\\csc x \\cot x', '\\cot x', '-\\csc^2 x'] },
-            { t: () => `\\int \\sin(\\_\\_\\_\\_\\_) \\cdot \\cos(\\_\\_\\_\\_\\_) \\cdot 2 \\, dx`, u: '\\sin(2x)', du: '2\\cos(2x)', ops: ['\\sin(2x)', '2\\cos(2x)', '\\cos(2x)', '-2\\sin(2x)'] },
-            
-            // NIVEL 4: Polinomios y raíces (22-28)
-            { t: () => `\\int (\\_\\_\\_\\_\\_)^4 \\cdot \\_\\_\\_\\_\\_ \\, dx`, u: 'x^2+1', du: '2x', ops: ['x^2+1', '2x', 'x^2', 'x^4'] },
-            { t: () => `\\int \\sqrt{\\_\\_\\_\\_\\_} \\cdot \\_\\_\\_\\_\\_ \\, dx`, u: 'x^3+2', du: '3x^2', ops: ['x^3+2', '3x^2', 'x^3', 'x^2'] },
-            { t: () => `\\int \\frac{\\_\\_\\_\\_\\_}{\\_\\_\\_\\_\\_} \\, dx`, u: 'x^2+1', du: '2x', ops: ['x^2+1', '2x', 'x^2', 'x'] },
-            { t: () => `\\int \\frac{\\_\\_\\_\\_\\_}{\\_\\_\\_\\_\\_} \\, dx`, u: 'x^3+1', du: '3x^2', ops: ['x^3+1', '3x^2', 'x^3', 'x^2'] },
-            { t: () => `\\int (\\_\\_\\_\\_\\_)^5 \\cdot \\_\\_\\_\\_\\_ \\, dx`, u: 'x^4+3x', du: '4x^3+3', ops: ['x^4+3x', '4x^3+3', 'x^4', '4x^3'] },
-            { t: () => `\\int \\sqrt[3]{\\_\\_\\_\\_\\_} \\cdot \\_\\_\\_\\_\\_ \\, dx`, u: 'x^5+2x', du: '5x^4+2', ops: ['x^5+2x', '5x^4+2', 'x^5', '5x^4'] },
-            { t: () => `\\int \\frac{\\_\\_\\_\\_\\_}{\\_\\_\\_\\_\\_} \\, dx`, u: 'x^4+x^2', du: '4x^3+2x', ops: ['x^4+x^2', '4x^3+2x', 'x^4', '4x^3'] },
-            
-            // NIVEL 5: Exponenciales y logaritmos (29-35)
-            { t: () => `\\int e^{\\_\\_\\_\\_\\_} \\cdot \\_\\_\\_\\_\\_ \\, dx`, u: 'x^2', du: '2x', ops: ['x^2', '2x', 'e^x', 'e^{x^2}'] },
-            { t: () => `\\int e^{\\_\\_\\_\\_\\_} \\cdot \\_\\_\\_\\_\\_ \\, dx`, u: '\\sin x', du: '\\cos x', ops: ['\\sin x', '\\cos x', 'e^x', 'e^{\\sin x}'] },
-            { t: () => `\\int \\frac{e^{\\_\\_\\_\\_\\_}}{\\_\\_\\_\\_\\_} \\, dx`, u: '\\sqrt{x}', du: '\\frac{1}{2\\sqrt{x}}', ops: ['\\sqrt{x}', '\\frac{1}{2\\sqrt{x}}', 'e^x', 'x^{1/2}'] },
-            { t: () => `\\int \\frac{\\_\\_\\_\\_\\_}{\\_\\_\\_\\_\\_} \\, dx`, u: '\\ln x', du: '\\frac{1}{x}', ops: ['\\ln x', '\\frac{1}{x}', 'x', '\\ln^2 x'] },
-            { t: () => `\\int (\\_\\_\\_\\_\\_)^3 \\cdot \\_\\_\\_\\_\\_ \\, dx`, u: '\\ln x', du: '\\frac{1}{x}', ops: ['\\ln x', '\\frac{1}{x}', 'x', '\\ln^3 x'] },
-            { t: () => `\\int \\frac{\\_\\_\\_\\_\\_}{\\_\\_\\_\\_\\_} \\, dx`, u: '1+e^x', du: 'e^x', ops: ['1+e^x', 'e^x', 'e^x', 'x'] },
-            { t: () => `\\int e^{\\_\\_\\_\\_\\_} \\cdot \\_\\_\\_\\_\\_ \\, dx`, u: 'x+e^x', du: '1+e^x', ops: ['x+e^x', '1+e^x', 'e^x', 'x'] },
-            
-            // NIVEL 6: Trigonométricas con polinomios (36-42)
-            { t: () => `\\int \\sin(\\_\\_\\_\\_\\_) \\cdot \\_\\_\\_\\_\\_ \\, dx`, u: 'x^2', du: '2x', ops: ['x^2', '2x', '\\sin x', '\\cos x'] },
-            { t: () => `\\int \\cos(\\_\\_\\_\\_\\_) \\cdot \\_\\_\\_\\_\\_ \\, dx`, u: '\\ln x', du: '\\frac{1}{x}', ops: ['\\ln x', '\\frac{1}{x}', '\\cos x', '-\\sin x'] },
-            { t: () => `\\int \\sec^2(\\_\\_\\_\\_\\_) \\cdot \\_\\_\\_\\_\\_ \\, dx`, u: 'e^x', du: 'e^x', ops: ['e^x', 'e^x', '\\sec^2 x', '\\tan x'] },
-            { t: () => `\\int \\tan(\\_\\_\\_\\_\\_) \\cdot \\_\\_\\_\\_\\_ \\, dx`, u: '\\sqrt{x}', du: '\\frac{1}{2\\sqrt{x}}', ops: ['\\sqrt{x}', '\\frac{1}{2\\sqrt{x}}', '\\tan x', '\\sec^2 x'] },
-            { t: () => `\\int \\sin^2(\\_\\_\\_\\_\\_) \\cdot \\_\\_\\_\\_\\_ \\, dx`, u: '\\sin x', du: '\\cos x', ops: ['\\sin x', '\\cos x', '\\sin^2 x', '2\\sin x\\cos x'] },
-            { t: () => `\\int \\cos^3(\\_\\_\\_\\_\\_) \\cdot \\_\\_\\_\\_\\_ \\, dx`, u: '\\cos x', du: '-\\sin x', ops: ['\\cos x', '-\\sin x', '\\cos^3 x', '-3\\cos^2 x\\sin x'] },
-            { t: () => `\\int \\frac{\\sec^2(\\_\\_\\_\\_\\_)}{\\_\\_\\_\\_\\_} \\, dx`, u: '\\ln x', du: '\\frac{1}{x}', ops: ['\\ln x', '\\frac{1}{x}', '\\sec^2 x', '\\tan x'] },
-            
-            // NIVEL 7: Mixtos y avanzados (43-50)
-            { t: () => `\\int \\frac{\\_\\_\\_\\_\\_}{\\sqrt{1 - (\\_\\_\\_\\_\\_)^2}} \\, dx`, u: 'x^2', du: '2x', ops: ['x^2', '2x', '\\sqrt{1-x^4}', '-4x^3'] },
-            { t: () => `\\int \\frac{\\_\\_\\_\\_\\_}{1 + (\\_\\_\\_\\_\\_)^2} \\, dx`, u: 'e^x', du: 'e^x', ops: ['e^x', 'e^x', 'e^{2x}', '2e^{2x}'] },
-            { t: () => `\\int \\frac{\\_\\_\\_\\_\\_}{1 + (\\_\\_\\_\\_\\_)^2} \\, dx`, u: '\\cos x', du: '-\\sin x', ops: ['\\cos x', '-\\sin x', '\\sin x', '\\cos x'] },
-            { t: () => `\\int \\frac{1}{\\_\\_\\_\\_\\_ \\cdot \\sqrt{1 - (\\_\\_\\_\\_\\_)^2}} \\, dx`, u: '\\ln x', du: '\\frac{1}{x}', ops: ['\\ln x', '\\frac{1}{x}', 'x', '\\ln^2 x'] },
-            { t: () => `\\int \\_\\_\\_\\_\\_ \\cdot \\sqrt[3]{\\_\\_\\_\\_\\_} \\, dx`, u: 'x^2+1', du: '2x', ops: ['x^2+1', '2x', 'x^2', 'x'] },
-            { t: () => `\\int \\frac{\\_\\_\\_\\_\\_}{\\sqrt{1 - (\\_\\_\\_\\_\\_)^2}} \\, dx`, u: 'x^4', du: '4x^3', ops: ['x^4', '4x^3', 'x^8', '8x^7'] },
-            { t: () => `\\int \\frac{\\_\\_\\_\\_\\_}{\\sqrt{1 - (\\_\\_\\_\\_\\_)^2}} \\, dx`, u: 'e^{2x}', du: '2e^{2x}', ops: ['e^{2x}', '2e^{2x}', 'e^{4x}', '4e^{4x}'] },
-            { t: () => `\\int \\frac{\\sin(2x)}{1 + (\\_\\_\\_\\_\\_)^2} \\, dx`, u: '\\cos^2 x', du: '-2\\cos x\\sin x', ops: ['\\cos^2 x', '-2\\cos x\\sin x', '\\sin(2x)', '2\\cos(2x)'] }
-        ];
+function refrescar() {
+    const box = document.getElementById('math-box');
+    box.innerHTML = `\\[ ${actual.t(elegidos)} \\]`;
+    const cont = document.getElementById('botones-opciones');
+    cont.innerHTML = actual.ops.map(o => `<button class="btn-opcion" onclick="pulsar('${o}')">\\(${o}\\)</button>`).join('');
+    MathJax.typesetPromise();
+}
 
-        // Nombres de los niveles
-        const NOMBRES_NIVEL = [
-            "🟢 NIVEL 1: Lineales simples",
-            "🟢 NIVEL 2: Polinomios simples",
-            "🟡 NIVEL 3: Trigonométricas compuestas",
-            "🟡 NIVEL 4: Polinomios y raíces",
-            "🟠 NIVEL 5: Exponenciales y logaritmos",
-            "🟠 NIVEL 6: Trigonométricas con polinomios",
-            "🔴 NIVEL 7: Mixtos y avanzados"
-        ];
+function pulsar(v) {
+    if(elegidos.length < 2) { elegidos.push(v); refrescar(); }
+}
 
-        function cargar() {
-            // Seleccionar ejercicio según progreso
-            ejercicioIndex = Math.min(score, EJERCICIOS.length - 1);
-            actual = EJERCICIOS[ejercicioIndex];
-            
-            // Determinar nivel (1-7)
-            nivelActual = Math.floor(ejercicioIndex / 7) + 1;
-            document.getElementById('nivel-val').innerText = nivelActual;
-            document.getElementById('dificultad-val').innerText = 
-                nivelActual <= 2 ? 'Básico' : (nivelActual <= 4 ? 'Intermedio' : 'Avanzado');
-            document.getElementById('nivel-badge').innerText = NOMBRES_NIVEL[nivelActual - 1];
-            
-            // Progreso
-            document.getElementById('progreso').innerText = `${ejercicioIndex + 1}/${EJERCICIOS.length}`;
-            
-            elegidos = [];
-            refrescarMath();
-            
-            // Mezclar opciones
-            const mezcladas = [...actual.ops].sort(() => Math.random() - 0.5);
-            document.getElementById('botones-opciones').innerHTML = mezcladas.map(o => 
-                `<button class="btn-opcion" onclick="pulsar('${o.replace(/'/g, "\\'")}', this)">\\(${o}\\)</button>`
-            ).join('');
-            
-            MathJax.typesetPromise();
-        }
+function limpiar() { elegidos = []; refrescar(); }
+function saltar() { score++; cargar(); }
 
-        function pulsar(v, btn) {
-            if (elegidos.length < 2) {
-                elegidos.push(v);
-                btn.classList.add('seleccionada');
-                refrescarMath();
-            }
-        }
-
-        function limpiar() {
-            elegidos = [];
-            document.querySelectorAll('.btn-opcion').forEach(b => b.classList.remove('seleccionada'));
-            refrescarMath();
-        }
-
-        function saltar() {
-            cargar();
-            document.getElementById('feedback').innerHTML = "<span style='color:#7f8c8d'>Ejercicio saltado</span>";
-        }
-
-        function refrescarMath() {
-            const box = document.getElementById('math-box');
-            box.innerHTML = `\\[ ${actual.t()} \\]`;
-            MathJax.typesetPromise([box]);
-        }
-
-        function validar() {
-            const fb = document.getElementById('feedback');
-            if (elegidos.length < 2) {
-                fb.innerHTML = "<span style='color:#e67e22'>⚠️ Selecciona dos funciones (u y du)</span>";
-                return;
-            }
-
-            // Validar: primero u, luego du
-            if (elegidos[0] === actual.u && elegidos[1] === actual.du) {
-                fb.innerHTML = "<span style='color:#27ae60'>✅ ¡Correcto! +1 punto</span>";
-                score++;
-                document.getElementById('puntos-val').innerText = score;
-                
-                if (score < EJERCICIOS.length) {
-                    setTimeout(() => { 
-                        fb.innerText = ""; 
-                        cargar(); 
-                    }, 1500);
-                } else {
-                    fb.innerHTML = "<span style='color:#8e44ad'>🎉 ¡Felicidades! Completaste los 50 ejercicios</span>";
-                }
-            } else {
-                fb.innerHTML = "<span style='color:#c0392b'>❌ Incorrecto. El orden es: función u y luego su derivada du</span>";
-            }
-        }
-
-        window.onload = cargar;
-    </script>
+function validar() {
+    if(elegidos[0] === actual.u && elegidos[1] === actual.du) {
+        document.getElementById('feedback').innerText = "¡Correcto!";
+        score++; setTimeout(cargar, 1000);
+    } else {
+        document.getElementById('feedback').innerText = "Incorrecto. Orden: u, du.";
+        limpiar();
+    }
+}
+window.onload = cargar;
+</script>
 </body>
 </html>

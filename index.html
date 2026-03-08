@@ -1,306 +1,416 @@
-
 <!DOCTYPE html>
 <html lang="es">
 
 <head>
-<meta charset="UTF-8">
-<title>Juego Cambio de Variable</title>
-
-<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-
-<style>
-
-body{
-font-family:Arial;
-max-width:900px;
-margin:auto;
-padding:20px;
-background:#f4f4f4;
-}
-
-h1{text-align:center}
-
-.ejercicio{
-background:white;
-padding:20px;
-border-radius:10px;
-margin:20px 0;
-}
-
-.dropzone{
-width:180px;
-height:50px;
-border:2px dashed gray;
-display:inline-block;
-text-align:center;
-line-height:50px;
-margin:10px;
-background:#fafafa;
-}
-
-.opcion{
-display:inline-block;
-padding:8px 15px;
-margin:6px;
-background:#ddd;
-border-radius:6px;
-cursor:grab;
-}
-
-.correcto{color:green;font-weight:bold}
-.incorrecto{color:red;font-weight:bold}
-
-</style>
-
+    <meta charset="UTF-8">
+    <title>Juego Cambio de Variable</title>
+    
+    <!-- MathJax configuración primero -->
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']],
+                processEscapes: true
+            },
+            svg: {
+                fontCache: 'global'
+            },
+            options: {
+                ignoreHtmlClass: 'tex2jax_ignore',
+                processHtmlClass: 'tex2jax_process'
+            }
+        };
+    </script>
+    
+    <!-- Cargar MathJax -->
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+    
+    <style>
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            max-width: 900px;
+            margin: auto;
+            padding: 20px;
+            background: #f0f2f5;
+        }
+        
+        h1 {
+            text-align: center;
+            color: #1a73e8;
+        }
+        
+        .ejercicio {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            margin: 20px 0;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        .integral {
+            font-size: 1.4em;
+            text-align: center;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .dropzones-container {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+        
+        .dropzone-item {
+            text-align: center;
+        }
+        
+        .dropzone-label {
+            font-weight: bold;
+            color: #5f6368;
+            margin-bottom: 5px;
+        }
+        
+        .dropzone {
+            width: 150px;
+            height: 50px;
+            border: 3px dashed #1a73e8;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 5px auto;
+            background: #e8f0fe;
+            font-size: 1.2em;
+            color: #1a73e8;
+            transition: all 0.3s;
+        }
+        
+        .dropzone:hover {
+            background: #d2e3fc;
+            border-color: #0d47a1;
+        }
+        
+        .opciones-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            margin: 20px 0;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+        
+        .opcion {
+            display: inline-block;
+            padding: 12px 20px;
+            margin: 5px;
+            background: white;
+            border: 2px solid #1a73e8;
+            border-radius: 8px;
+            cursor: grab;
+            font-size: 1.1em;
+            color: #1a73e8;
+            transition: all 0.3s;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .opcion:hover {
+            background: #1a73e8;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        
+        .opcion:active {
+            cursor: grabbing;
+        }
+        
+        .correcto {
+            color: #0f9d58;
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+        
+        .incorrecto {
+            color: #d93025;
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+        
+        .score-container {
+            text-align: center;
+            font-size: 1.3em;
+            margin: 20px 0;
+            padding: 15px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        #score {
+            font-weight: bold;
+            color: #1a73e8;
+            font-size: 1.5em;
+        }
+        
+        button {
+            display: block;
+            width: 200px;
+            margin: 20px auto;
+            padding: 15px 30px;
+            background: #1a73e8;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        button:hover {
+            background: #0d47a1;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        }
+        
+        #resultado {
+            text-align: center;
+            font-size: 1.3em;
+            min-height: 50px;
+            padding: 10px;
+        }
+        
+        .mjx-chtml {
+            text-align: left !important;
+        }
+    </style>
 </head>
 
 <body>
-
-<h1>Juego de Cambio de Variable</h1>
-
-<p>Puntuación: <span id="score">0</span></p>
-
-<div id="ejercicio"></div>
-
-<button onclick="verificar()">Verificar</button>
-
-<p id="resultado"></p>
-
-<script>
-
-let puntuacion=0
-
-let ejercicioActual=null
-
-function aleatorio(min,max){
-
-return Math.floor(Math.random()*(max-min+1))+min
-
-}
-
-function generarPolinomio(){
-
-let n=aleatorio(2,5)
-
-return {
-g:`x^{${n}}`,
-dg:`${n}x^{${n-1}}`
-}
-
-}
-
-function generarLineal(){
-
-let a=aleatorio(2,6)
-
-return{
-g:`${a}x`,
-dg:`${a}`
-}
-
-}
-
-function generarTrig(){
-
-let a=aleatorio(2,5)
-
-return{
-g:`${a}x`,
-dg:`${a}`,
-forma:"trig"
-}
-
-}
-
-function generarEjercicio(){
-
-let tipo=aleatorio(1,3)
-
-let base
-
-if(tipo==1) base=generarPolinomio()
-if(tipo==2) base=generarLineal()
-if(tipo==3) base=generarTrig()
-
-let integral=""
-
-if(tipo==1){
-
-let p=aleatorio(2,5)
-
-integral=`\\( \\int (${base.g})^{${p}} ${base.dg} \\, dx \\)`
-
-}
-
-if(tipo==2){
-
-integral=`\\( \\int e^{${base.g}} ${base.dg} \\, dx \\)`
-
-}
-
-if(tipo==3){
-
-integral=`\\( \\int \\sin(${base.g}) ${base.dg} \\, dx \\)`
-
-}
-
-let distractores=[
-
-"x^2","2x","3x^2","x^3","4","5x"
-
-]
-
-let opciones=[
-
-{id:"u",texto:base.g},
-{id:"du",texto:base.dg}
-
-]
-
-let distractores=[
-
-{id:"d1",texto:"x^2"},
-{id:"d2",texto:"2x"},
-{id:"d3",texto:"3x^2"},
-{id:"d4",texto:"x^3"},
-{id:"d5",texto:"4"}
-
-]
-
-while(opciones.length<6){
-
-let d=distractores[aleatorio(0,distractores.length-1)]
-
-if(!opciones.some(o=>o.texto==d.texto)) opciones.push(d)
-
-}
-
-opciones.sort(()=>Math.random()-0.5)
-while(opciones.length<6){
-
-let d=distractores[aleatorio(0,distractores.length-1)]
-
-if(!opciones.includes(d)) opciones.push(d)
-
-}
-
-opciones.sort(()=>Math.random()-0.5)
-
-ejercicioActual={
-
-u:base.g,
-du:base.dg,
-integral:integral,
-opciones:opciones
-
-}
-
-dibujar()
-
-}
-
-function dibujar(){
-
-let html=""
-
-html+=`<div class="ejercicio">`
-
-html+=`<p>${ejercicioActual.integral}</p>`
-
-html+=`u:
-<div class="dropzone" id="u" ondrop="drop(event)" ondragover="allowDrop(event)">?</div>`
-
-html+=`du:
-<div class="dropzone" id="du" ondrop="drop(event)" ondragover="allowDrop(event)">?</div>`
-
-html+=`<div>`
-
-ejercicioActual.opciones.forEach(o=>{
-
-html+=`<div class="opcion" draggable="true"
-ondragstart="drag(event)"
-data-id="${o.id}"
-id="opt${Math.random()}">
-
-\\(${o.texto}\\)
-
-</div>`
-
-})
-html+=`</div></div>`
-
-document.getElementById("ejercicio").innerHTML=html
-
-MathJax.typeset()
-
-}
-
-function allowDrop(ev){
-
-ev.preventDefault()
-
-}
-
-function drop(ev){
-
-ev.preventDefault()
-
-let id=ev.dataTransfer.getData("id")
-
-ev.target.dataset.value=id
-
-ev.target.innerHTML="✓"
-
-}
-
-  
-function drop(ev){
-
-ev.preventDefault()
-
-let data=ev.dataTransfer.getData("text")
-
-ev.target.innerHTML=data
-
-ev.target.setAttribute("data-value",data)
-
-}
-unction verificar(){
-
-let u=document.getElementById("u").dataset.value
-let du=document.getElementById("du").dataset.value
-
-if(u=="u" && du=="du"){
-
-document.getElementById("resultado").innerHTML="Muy bien"
-
-}else{
-
-document.getElementById("resultado").innerHTML="Intenta otra vez"
-
-}
-
-
-
-puntuacion++
-
-document.getElementById("score").innerText=puntuacion
-
-generarEjercicio()
-
-}else{
-
-document.getElementById("resultado").innerHTML="<span class='incorrecto'>Intenta otra vez</span>"
-
-}
-
-}
-
-generarEjercicio()
-
-</script>
-
+    <h1>🎮 Juego de Cambio de Variable</h1>
+    
+    <div class="score-container">
+        Puntuación: <span id="score">0</span>
+    </div>
+    
+    <div id="ejercicio"></div>
+    
+    <button onclick="verificar()">Verificar respuesta</button>
+    
+    <div id="resultado"></div>
+
+    <script>
+        let puntuacion = 0;
+        let ejercicioActual = null;
+        
+        function aleatorio(min, max) {
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+        
+        function generarExpresion() {
+            let tipo = aleatorio(1, 5);
+            
+            switch(tipo) {
+                case 1: // Polinomio
+                    let n = aleatorio(2, 4);
+                    return {
+                        u: `x^{${n}}`,
+                        du: `${n}x^{${n-1}}`,
+                        integral: `\\int (${n}x^{${n-1}}) \\cdot (x^{${n}})^{${aleatorio(2,3)}} \\, dx`
+                    };
+                    
+                case 2: // Exponencial
+                    let a = aleatorio(2, 4);
+                    return {
+                        u: `${a}x`,
+                        du: `${a}`,
+                        integral: `\\int e^{${a}x} \\cdot ${a} \\, dx`
+                    };
+                    
+                case 3: // Seno
+                    let b = aleatorio(2, 4);
+                    return {
+                        u: `${b}x`,
+                        du: `${b}`,
+                        integral: `\\int \\sin(${b}x) \\cdot ${b} \\, dx`
+                    };
+                    
+                case 4: // Coseno
+                    let c = aleatorio(2, 4);
+                    return {
+                        u: `${c}x`,
+                        du: `${c}`,
+                        integral: `\\int \\cos(${c}x) \\cdot ${c} \\, dx`
+                    };
+                    
+                case 5: // Potencia con lineal
+                    let d = aleatorio(2, 4);
+                    let p = aleatorio(2, 3);
+                    return {
+                        u: `${d}x`,
+                        du: `${d}`,
+                        integral: `\\int (${d}x)^{${p}} \\cdot ${d} \\, dx`
+                    };
+                    
+                default:
+                    return {
+                        u: 'x^2',
+                        du: '2x',
+                        integral: '\\int 2x \\cdot (x^2)^2 \\, dx'
+                    };
+            }
+        }
+        
+        function generarDistractores(u, du) {
+            let distractores = [
+                'x^2', '2x', '3x^2', 'x^3', '4x', '5', '6x', 
+                'x^4', '4x^3', '\\sin x', '\\cos x', 'e^x', 
+                '\\frac{1}{x}', '\\ln x', '\\tan x', '\\sec^2 x'
+            ];
+            
+            // Filtrar para no incluir u y du
+            distractores = distractores.filter(d => d !== u && d !== du);
+            
+            // Seleccionar 4 distractores aleatorios
+            let seleccionados = [];
+            while(seleccionados.length < 4) {
+                let idx = aleatorio(0, distractores.length - 1);
+                let d = distractores[idx];
+                if(!seleccionados.includes(d) && d !== u && d !== du) {
+                    seleccionados.push(d);
+                }
+            }
+            
+            return seleccionados;
+        }
+        
+        function generarEjercicio() {
+            let expr = generarExpresion();
+            
+            let distractores = generarDistractores(expr.u, expr.du);
+            
+            // Crear opciones (u, du, y 4 distractores)
+            let opciones = [expr.u, expr.du, ...distractores];
+            
+            // Mezclar opciones
+            opciones.sort(() => Math.random() - 0.5);
+            
+            ejercicioActual = {
+                u: expr.u,
+                du: expr.du,
+                integral: expr.integral,
+                opciones: opciones
+            };
+            
+            dibujar();
+        }
+        
+        function dibujar() {
+            let html = `
+                <div class="ejercicio">
+                    <div class="integral" id="integral">
+                        ${ejercicioActual.integral}
+                    </div>
+                    
+                    <div class="dropzones-container">
+                        <div class="dropzone-item">
+                            <div class="dropzone-label">u =</div>
+                            <div class="dropzone" id="u" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
+                        </div>
+                        
+                        <div class="dropzone-item">
+                            <div class="dropzone-label">du =</div>
+                            <div class="dropzone" id="du" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="opciones-container">
+            `;
+            
+            ejercicioActual.opciones.forEach((opcion, index) => {
+                html += `<div class="opcion" draggable="true" ondragstart="drag(event)" id="op_${index}" data-value="${opcion}">\\(${opcion}\\)</div>`;
+            });
+            
+            html += `
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById("ejercicio").innerHTML = html;
+            
+            // Procesar MathJax
+            if (window.MathJax) {
+                MathJax.typesetPromise().then(() => {
+                    console.log('MathJax procesado correctamente');
+                }).catch((err) => {
+                    console.error('Error en MathJax:', err);
+                });
+            }
+        }
+        
+        function allowDrop(ev) {
+            ev.preventDefault();
+        }
+        
+        function drag(ev) {
+            let valor = ev.target.getAttribute('data-value');
+            ev.dataTransfer.setData("text/plain", valor);
+            ev.dataTransfer.effectAllowed = "copy";
+        }
+        
+        function drop(ev) {
+            ev.preventDefault();
+            let data = ev.dataTransfer.getData("text/plain");
+            
+            if (data) {
+                ev.target.innerHTML = `\\(${data}\\)`;
+                ev.target.setAttribute("data-value", data);
+                
+                // Reprocesar MathJax para este elemento
+                if (window.MathJax) {
+                    MathJax.typesetPromise([ev.target]).catch(err => console.error(err));
+                }
+            }
+        }
+        
+        function verificar() {
+            let uDrop = document.getElementById("u");
+            let duDrop = document.getElementById("du");
+            
+            let u = uDrop.getAttribute("data-value");
+            let du = duDrop.getAttribute("data-value");
+            
+            if (!u || !du) {
+                document.getElementById("resultado").innerHTML = "<span class='incorrecto'>❓ Debes arrastrar ambas funciones</span>";
+                return;
+            }
+            
+            // Limpiar espacios y comparar
+            if (u.trim() === ejercicioActual.u.trim() && du.trim() === ejercicioActual.du.trim()) {
+                document.getElementById("resultado").innerHTML = "<span class='correcto'>✅ ¡Muy bien! +1 punto</span>";
+                puntuacion++;
+                document.getElementById("score").innerText = puntuacion;
+                
+                // Nuevo ejercicio después de 1 segundo
+                setTimeout(() => {
+                    generarEjercicio();
+                    document.getElementById("resultado").innerHTML = "";
+                }, 1000);
+            } else {
+                document.getElementById("resultado").innerHTML = "<span class='incorrecto'>❌ Intenta otra vez</span>";
+            }
+        }
+        
+        // Iniciar el juego
+        generarEjercicio();
+    </script>
 </body>
 
 </html>
-```

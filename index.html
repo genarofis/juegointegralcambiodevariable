@@ -5,7 +5,6 @@
     <meta charset="UTF-8">
     <title>Juego Cambio de Variable</title>
     
-    <!-- MathJax configuración primero -->
     <script>
         window.MathJax = {
             tex: {
@@ -15,15 +14,10 @@
             },
             svg: {
                 fontCache: 'global'
-            },
-            options: {
-                ignoreHtmlClass: 'tex2jax_ignore',
-                processHtmlClass: 'tex2jax_process'
             }
         };
     </script>
     
-    <!-- Cargar MathJax -->
     <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
     
     <style>
@@ -49,12 +43,23 @@
         }
         
         .integral {
-            font-size: 1.4em;
+            font-size: 1.8em;
             text-align: center;
-            padding: 15px;
+            padding: 20px;
             background: #f8f9fa;
             border-radius: 10px;
             margin-bottom: 20px;
+            font-family: monospace;
+        }
+        
+        .espacio {
+            display: inline-block;
+            width: 80px;
+            border-bottom: 2px dashed #1a73e8;
+            margin: 0 5px;
+            text-align: center;
+            font-size: 1.2em;
+            color: #1a73e8;
         }
         
         .dropzones-container {
@@ -73,11 +78,12 @@
             font-weight: bold;
             color: #5f6368;
             margin-bottom: 5px;
+            font-size: 1.2em;
         }
         
         .dropzone {
             width: 150px;
-            height: 50px;
+            height: 60px;
             border: 3px dashed #1a73e8;
             border-radius: 10px;
             display: flex;
@@ -85,7 +91,7 @@
             justify-content: center;
             margin: 5px auto;
             background: #e8f0fe;
-            font-size: 1.2em;
+            font-size: 1.3em;
             color: #1a73e8;
             transition: all 0.3s;
         }
@@ -114,7 +120,7 @@
             border: 2px solid #1a73e8;
             border-radius: 8px;
             cursor: grab;
-            font-size: 1.1em;
+            font-size: 1.2em;
             color: #1a73e8;
             transition: all 0.3s;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
@@ -134,13 +140,13 @@
         .correcto {
             color: #0f9d58;
             font-weight: bold;
-            font-size: 1.2em;
+            font-size: 1.3em;
         }
         
         .incorrecto {
             color: #d93025;
             font-weight: bold;
-            font-size: 1.2em;
+            font-size: 1.3em;
         }
         
         .score-container {
@@ -186,10 +192,6 @@
             min-height: 50px;
             padding: 10px;
         }
-        
-        .mjx-chtml {
-            text-align: left !important;
-        }
     </style>
 </head>
 
@@ -214,98 +216,93 @@
             return Math.floor(Math.random() * (max - min + 1)) + min;
         }
         
-        function generarExpresion() {
-            let tipo = aleatorio(1, 5);
+        function generarEjercicio() {
+            let tipo = aleatorio(1, 8);
+            let u, du, integral;
             
             switch(tipo) {
-                case 1: // Polinomio
+                case 1: // Potencia
                     let n = aleatorio(2, 4);
-                    return {
-                        u: `x^{${n}}`,
-                        du: `${n}x^{${n-1}}`,
-                        integral: `\\int (${n}x^{${n-1}}) \\cdot (x^{${n}})^{${aleatorio(2,3)}} \\, dx`
-                    };
+                    let p = aleatorio(2, 3);
+                    u = `x^{${n}}`;
+                    du = `${n}x^{${n-1}}`;
+                    integral = `\\( \\int (\\_\\_\\_\\_\\_)^{${p}} \\cdot \\_\\_\\_\\_\\_ \\, dx \\)`;
+                    break;
                     
                 case 2: // Exponencial
                     let a = aleatorio(2, 4);
-                    return {
-                        u: `${a}x`,
-                        du: `${a}`,
-                        integral: `\\int e^{${a}x} \\cdot ${a} \\, dx`
-                    };
+                    u = `${a}x`;
+                    du = `${a}`;
+                    integral = `\\( \\int \\_\\_\\_\\_\\_ \\cdot e^{\\_\\_\\_\\_\\_} \\, dx \\)`;
+                    break;
                     
                 case 3: // Seno
                     let b = aleatorio(2, 4);
-                    return {
-                        u: `${b}x`,
-                        du: `${b}`,
-                        integral: `\\int \\sin(${b}x) \\cdot ${b} \\, dx`
-                    };
+                    u = `${b}x`;
+                    du = `${b}`;
+                    integral = `\\( \\int \\_\\_\\_\\_\\_ \\cdot \\sin(\\_\\_\\_\\_\\_) \\, dx \\)`;
+                    break;
                     
                 case 4: // Coseno
                     let c = aleatorio(2, 4);
-                    return {
-                        u: `${c}x`,
-                        du: `${c}`,
-                        integral: `\\int \\cos(${c}x) \\cdot ${c} \\, dx`
-                    };
+                    u = `${c}x`;
+                    du = `${c}`;
+                    integral = `\\( \\int \\_\\_\\_\\_\\_ \\cdot \\cos(\\_\\_\\_\\_\\_) \\, dx \\)`;
+                    break;
                     
                 case 5: // Potencia con lineal
                     let d = aleatorio(2, 4);
-                    let p = aleatorio(2, 3);
-                    return {
-                        u: `${d}x`,
-                        du: `${d}`,
-                        integral: `\\int (${d}x)^{${p}} \\cdot ${d} \\, dx`
-                    };
+                    let q = aleatorio(2, 3);
+                    u = `${d}x`;
+                    du = `${d}`;
+                    integral = `\\( \\int (\\_\\_\\_\\_\\_)^{${q}} \\cdot \\_\\_\\_\\_\\_ \\, dx \\)`;
+                    break;
                     
-                default:
-                    return {
-                        u: 'x^2',
-                        du: '2x',
-                        integral: '\\int 2x \\cdot (x^2)^2 \\, dx'
-                    };
+                case 6: // Sec^2
+                    let e = aleatorio(2, 4);
+                    u = `${e}x`;
+                    du = `${e}`;
+                    integral = `\\( \\int \\_\\_\\_\\_\\_ \\cdot \\sec^2(\\_\\_\\_\\_\\_) \\, dx \\)`;
+                    break;
+                    
+                case 7: // Logaritmo
+                    u = `\\ln x`;
+                    du = `\\frac{1}{x}`;
+                    integral = `\\( \\int \\frac{\\_\\_\\_\\_\\_}{\\_\\_\\_\\_\\_} \\, dx \\)`;
+                    break;
+                    
+                case 8: // Potencia fraccionaria
+                    let m = aleatorio(2, 3);
+                    u = `x^{${m}}`;
+                    du = `${m}x^{${m-1}}`;
+                    integral = `\\( \\int \\_\\_\\_\\_\\_ \\cdot (\\_\\_\\_\\_\\_)^{1/${m}} \\, dx \\)`;
+                    break;
             }
-        }
-        
-        function generarDistractores(u, du) {
-            let distractores = [
-                'x^2', '2x', '3x^2', 'x^3', '4x', '5', '6x', 
-                'x^4', '4x^3', '\\sin x', '\\cos x', 'e^x', 
-                '\\frac{1}{x}', '\\ln x', '\\tan x', '\\sec^2 x'
+            
+            let todasFunciones = [
+                'x^2', '2x', 'x^3', '3x^2', 'x^4', '4x^3',
+                '\\sin x', '\\cos x', 'e^x', '\\ln x', '\\frac{1}{x}',
+                '5x', '5', '6x^2', '2x^3', '\\sec^2 x', '\\tan x'
             ];
             
-            // Filtrar para no incluir u y du
-            distractores = distractores.filter(d => d !== u && d !== du);
+            // Asegurar que u y du están en las opciones
+            let opciones = [u, du];
             
-            // Seleccionar 4 distractores aleatorios
-            let seleccionados = [];
-            while(seleccionados.length < 4) {
-                let idx = aleatorio(0, distractores.length - 1);
-                let d = distractores[idx];
-                if(!seleccionados.includes(d) && d !== u && d !== du) {
-                    seleccionados.push(d);
+            // Añadir distractores
+            while(opciones.length < 6) {
+                let d = todasFunciones[aleatorio(0, todasFunciones.length - 1)];
+                if(!opciones.includes(d)) {
+                    opciones.push(d);
                 }
             }
-            
-            return seleccionados;
-        }
-        
-        function generarEjercicio() {
-            let expr = generarExpresion();
-            
-            let distractores = generarDistractores(expr.u, expr.du);
-            
-            // Crear opciones (u, du, y 4 distractores)
-            let opciones = [expr.u, expr.du, ...distractores];
             
             // Mezclar opciones
             opciones.sort(() => Math.random() - 0.5);
             
             ejercicioActual = {
-                u: expr.u,
-                du: expr.du,
-                integral: expr.integral,
+                u: u,
+                du: du,
+                integral: integral,
                 opciones: opciones
             };
             
@@ -315,18 +312,18 @@
         function dibujar() {
             let html = `
                 <div class="ejercicio">
-                    <div class="integral" id="integral">
+                    <div class="integral">
                         ${ejercicioActual.integral}
                     </div>
                     
                     <div class="dropzones-container">
                         <div class="dropzone-item">
-                            <div class="dropzone-label">u =</div>
+                            <div class="dropzone-label">Arrastra aquí la función u:</div>
                             <div class="dropzone" id="u" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
                         </div>
                         
                         <div class="dropzone-item">
-                            <div class="dropzone-label">du =</div>
+                            <div class="dropzone-label">Arrastra aquí la derivada du:</div>
                             <div class="dropzone" id="du" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
                         </div>
                     </div>
@@ -335,7 +332,7 @@
             `;
             
             ejercicioActual.opciones.forEach((opcion, index) => {
-                html += `<div class="opcion" draggable="true" ondragstart="drag(event)" id="op_${index}" data-value="${opcion}">\\(${opcion}\\)</div>`;
+                html += `<div class="opcion" draggable="true" ondragstart="drag(event)" data-value="${opcion}">\\(${opcion}\\)</div>`;
             });
             
             html += `
@@ -345,13 +342,8 @@
             
             document.getElementById("ejercicio").innerHTML = html;
             
-            // Procesar MathJax
             if (window.MathJax) {
-                MathJax.typesetPromise().then(() => {
-                    console.log('MathJax procesado correctamente');
-                }).catch((err) => {
-                    console.error('Error en MathJax:', err);
-                });
+                MathJax.typesetPromise();
             }
         }
         
@@ -362,7 +354,6 @@
         function drag(ev) {
             let valor = ev.target.getAttribute('data-value');
             ev.dataTransfer.setData("text/plain", valor);
-            ev.dataTransfer.effectAllowed = "copy";
         }
         
         function drop(ev) {
@@ -373,9 +364,8 @@
                 ev.target.innerHTML = `\\(${data}\\)`;
                 ev.target.setAttribute("data-value", data);
                 
-                // Reprocesar MathJax para este elemento
                 if (window.MathJax) {
-                    MathJax.typesetPromise([ev.target]).catch(err => console.error(err));
+                    MathJax.typesetPromise([ev.target]);
                 }
             }
         }
@@ -392,23 +382,20 @@
                 return;
             }
             
-            // Limpiar espacios y comparar
-            if (u.trim() === ejercicioActual.u.trim() && du.trim() === ejercicioActual.du.trim()) {
+            if (u === ejercicioActual.u && du === ejercicioActual.du) {
                 document.getElementById("resultado").innerHTML = "<span class='correcto'>✅ ¡Muy bien! +1 punto</span>";
                 puntuacion++;
                 document.getElementById("score").innerText = puntuacion;
                 
-                // Nuevo ejercicio después de 1 segundo
                 setTimeout(() => {
                     generarEjercicio();
                     document.getElementById("resultado").innerHTML = "";
-                }, 1000);
+                }, 1500);
             } else {
                 document.getElementById("resultado").innerHTML = "<span class='incorrecto'>❌ Intenta otra vez</span>";
             }
         }
         
-        // Iniciar el juego
         generarEjercicio();
     </script>
 </body>

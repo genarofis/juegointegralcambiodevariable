@@ -51,7 +51,7 @@ const BANCO = [
     // Niveles 3-4: Logaritmos y Raíces
     { t:(r)=>`\\int (${r[0]||'?'}) \\cdot ${r[1]||'?'} \\, dx`, u:'\\ln x', du:'\\frac{1}{x}', ops:['\\ln x','\\frac{1}{x}','x','e'], l:3 },
     { t:(r)=>`\\int \\sqrt{${r[0]||'?'}} \\cdot ${r[1]||'?'} \\, dx`, u:'x^2', du:'2x', ops:['x^2','2x','x','2'], l:3 },
-    { t:(r)=>`\\int \\frac{1}{${r[0]||'?'}} \\cdot ${r[1]||'?'} \\, dx`, u:'\\cos x', du:'-\\sin x', ops:['\\cos x','-\\sin x','\\sin x','x'], l:3 },
+    { t:(r)=>`\\int \\frac{1}{${r[0]||'?'}} \\cdot ${r[1]||'?'} \\, dx`, u:'\\cos x', du:'-\\sin x', ops:['\\cos x','-\\sin x','x','x'], l:3 },
     { t:(r)=>`\\int \\sqrt[3]{${r[0]||'?'}} \\cdot ${r[1]||'?'} \\, dx`, u:'x^3+1', du:'3x^2', ops:['x^3+1','3x^2','x^2','3'], l:3 },
     { t:(r)=>`\\int (${r[0]||'?'}) \\cdot ${r[1]||'?'} \\, dx`, u:'\\ln(x^2)', du:'\\frac{2}{x}', ops:['\\ln(x^2)','\\frac{2}{x}','x','2'], l:3 },
     { t:(r)=>`\\int e^{${r[0]||'?'}} \\cdot ${r[1]||'?'} \\, dx`, u:'\\sin x', du:'\\cos x', ops:['\\sin x','\\cos x','x','1'], l:4 },

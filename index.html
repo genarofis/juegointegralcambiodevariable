@@ -49,6 +49,15 @@
         
         .feedback { margin-top: 25px; font-weight: bold; font-size: 1.2rem; min-height: 35px; }
         .nivel-indicador { display: inline-block; padding: 5px 15px; border-radius: 20px; background: #f1c40f; color: #2c3e50; font-weight: bold; margin-bottom: 15px; }
+        
+        .espacio-blanco {
+            display: inline-block;
+            min-width: 80px;
+            border-bottom: 3px dashed #e67e22;
+            margin: 0 5px;
+            text-align: center;
+            color: #e67e22;
+        }
     </style>
 </head>
 <body>
@@ -80,73 +89,73 @@
         let ejercicioIndex = 0;
         let actual = {};
         let elegidos = [];
-        let ejerciciosCompletados = 0;
 
         // ==================== 50 EJERCICIOS ====================
+        // SOLO se muestra la integral con espacios en blanco, nunca las respuestas
         const EJERCICIOS = [
             // NIVEL 1: Lineales simples (1-7)
-            { t: (r) => `\\int (5x)^3 \\cdot 5 \\, dx`, u: '5x', du: '5', ops: ['5x', '5', 'x^3', '3x^2'] },
-            { t: (r) => `\\int e^{2x} \\cdot 2 \\, dx`, u: '2x', du: '2', ops: ['2x', '2', 'e^x', 'e^{2x}'] },
-            { t: (r) => `\\int \\sin(3x) \\cdot 3 \\, dx`, u: '3x', du: '3', ops: ['3x', '3', '\\sin x', '\\cos x'] },
-            { t: (r) => `\\int \\cos(4x) \\cdot 4 \\, dx`, u: '4x', du: '4', ops: ['4x', '4', '\\cos x', '-\\sin x'] },
-            { t: (r) => `\\int \\sec^2(2x) \\cdot 2 \\, dx`, u: '2x', du: '2', ops: ['2x', '2', '\\tan x', '\\sec^2 x'] },
-            { t: (r) => `\\int \\frac{1}{x} \\, dx`, u: 'x', du: '1', ops: ['x', '1', '\\ln x', '\\frac{1}{x}'] },
-            { t: (r) => `\\int (7x)^2 \\cdot 7 \\, dx`, u: '7x', du: '7', ops: ['7x', '7', 'x^2', '2x'] },
+            { t: () => `\\int (\\_\\_\\_\\_\\_)^3 \\cdot \\_\\_\\_\\_\\_ \\, dx`, u: '5x', du: '5', ops: ['5x', '5', 'x^3', '3x^2'] },
+            { t: () => `\\int e^{\\_\\_\\_\\_\\_} \\cdot \\_\\_\\_\\_\\_ \\, dx`, u: '2x', du: '2', ops: ['2x', '2', 'e^x', 'e^{2x}'] },
+            { t: () => `\\int \\sin(\\_\\_\\_\\_\\_) \\cdot \\_\\_\\_\\_\\_ \\, dx`, u: '3x', du: '3', ops: ['3x', '3', '\\sin x', '\\cos x'] },
+            { t: () => `\\int \\cos(\\_\\_\\_\\_\\_) \\cdot \\_\\_\\_\\_\\_ \\, dx`, u: '4x', du: '4', ops: ['4x', '4', '\\cos x', '-\\sin x'] },
+            { t: () => `\\int \\sec^2(\\_\\_\\_\\_\\_) \\cdot \\_\\_\\_\\_\\_ \\, dx`, u: '2x', du: '2', ops: ['2x', '2', '\\tan x', '\\sec^2 x'] },
+            { t: () => `\\int \\frac{\\_\\_\\_\\_\\_}{\\_\\_\\_\\_\\_} \\, dx`, u: 'x', du: '1', ops: ['x', '1', '\\ln x', '\\frac{1}{x}'] },
+            { t: () => `\\int (\\_\\_\\_\\_\\_)^2 \\cdot \\_\\_\\_\\_\\_ \\, dx`, u: '7x', du: '7', ops: ['7x', '7', 'x^2', '2x'] },
             
             // NIVEL 2: Polinomios simples (8-14)
-            { t: (r) => `\\int (x^3)^4 \\cdot 3x^2 \\, dx`, u: 'x^3', du: '3x^2', ops: ['x^3', '3x^2', 'x^4', '4x^3'] },
-            { t: (r) => `\\int (x^2)^5 \\cdot 2x \\, dx`, u: 'x^2', du: '2x', ops: ['x^2', '2x', 'x^5', '5x^4'] },
-            { t: (r) => `\\int e^{x^3} \\cdot 3x^2 \\, dx`, u: 'x^3', du: '3x^2', ops: ['x^3', '3x^2', 'e^x', 'e^{x^3}'] },
-            { t: (r) => `\\int \\sin(x^4) \\cdot 4x^3 \\, dx`, u: 'x^4', du: '4x^3', ops: ['x^4', '4x^3', '\\sin x', '\\cos x'] },
-            { t: (r) => `\\int \\cos(x^5) \\cdot 5x^4 \\, dx`, u: 'x^5', du: '5x^4', ops: ['x^5', '5x^4', '\\cos x', '-\\sin x'] },
-            { t: (r) => `\\int \\sec^2(x^6) \\cdot 6x^5 \\, dx`, u: 'x^6', du: '6x^5', ops: ['x^6', '6x^5', '\\tan x', '\\sec^2 x'] },
-            { t: (r) => `\\int (x^4)^3 \\cdot 4x^3 \\, dx`, u: 'x^4', du: '4x^3', ops: ['x^4', '4x^3', 'x^3', '3x^2'] },
+            { t: () => `\\int (\\_\\_\\_\\_\\_)^4 \\cdot \\_\\_\\_\\_\\_ \\, dx`, u: 'x^3', du: '3x^2', ops: ['x^3', '3x^2', 'x^4', '4x^3'] },
+            { t: () => `\\int (\\_\\_\\_\\_\\_)^5 \\cdot \\_\\_\\_\\_\\_ \\, dx`, u: 'x^2', du: '2x', ops: ['x^2', '2x', 'x^5', '5x^4'] },
+            { t: () => `\\int e^{\\_\\_\\_\\_\\_} \\cdot \\_\\_\\_\\_\\_ \\, dx`, u: 'x^3', du: '3x^2', ops: ['x^3', '3x^2', 'e^x', 'e^{x^3}'] },
+            { t: () => `\\int \\sin(\\_\\_\\_\\_\\_) \\cdot \\_\\_\\_\\_\\_ \\, dx`, u: 'x^4', du: '4x^3', ops: ['x^4', '4x^3', '\\sin x', '\\cos x'] },
+            { t: () => `\\int \\cos(\\_\\_\\_\\_\\_) \\cdot \\_\\_\\_\\_\\_ \\, dx`, u: 'x^5', du: '5x^4', ops: ['x^5', '5x^4', '\\cos x', '-\\sin x'] },
+            { t: () => `\\int \\sec^2(\\_\\_\\_\\_\\_) \\cdot \\_\\_\\_\\_\\_ \\, dx`, u: 'x^6', du: '6x^5', ops: ['x^6', '6x^5', '\\tan x', '\\sec^2 x'] },
+            { t: () => `\\int (\\_\\_\\_\\_\\_)^3 \\cdot \\_\\_\\_\\_\\_ \\, dx`, u: 'x^4', du: '4x^3', ops: ['x^4', '4x^3', 'x^3', '3x^2'] },
             
             // NIVEL 3: Trigonométricas compuestas (15-21)
-            { t: (r) => `\\int \\sin^3(x) \\cdot \\cos x \\, dx`, u: '\\sin x', du: '\\cos x', ops: ['\\sin x', '\\cos x', '\\tan x', '\\sec^2 x'] },
-            { t: (r) => `\\int \\cos^4(x) \\cdot (-\\sin x) \\, dx`, u: '\\cos x', du: '-\\sin x', ops: ['\\cos x', '-\\sin x', '\\sin x', '\\cos^2 x'] },
-            { t: (r) => `\\int \\tan^5(x) \\cdot \\sec^2 x \\, dx`, u: '\\tan x', du: '\\sec^2 x', ops: ['\\tan x', '\\sec^2 x', '\\cot x', '-\\csc^2 x'] },
-            { t: (r) => `\\int \\cot^3(x) \\cdot (-\\csc^2 x) \\, dx`, u: '\\cot x', du: '-\\csc^2 x', ops: ['\\cot x', '-\\csc^2 x', '\\tan x', '\\sec^2 x'] },
-            { t: (r) => `\\int \\sec^4(x) \\cdot \\sec x \\tan x \\, dx`, u: '\\sec x', du: '\\sec x \\tan x', ops: ['\\sec x', '\\sec x \\tan x', '\\tan x', '\\sec^2 x'] },
-            { t: (r) => `\\int \\csc^5(x) \\cdot (-\\csc x \\cot x) \\, dx`, u: '\\csc x', du: '-\\csc x \\cot x', ops: ['\\csc x', '-\\csc x \\cot x', '\\cot x', '-\\csc^2 x'] },
-            { t: (r) => `\\int \\sin(2x) \\cdot \\cos(2x) \\cdot 2 \\, dx`, u: '\\sin(2x)', du: '2\\cos(2x)', ops: ['\\sin(2x)', '2\\cos(2x)', '\\cos(2x)', '-2\\sin(2x)'] },
+            { t: () => `\\int \\sin^3(\\_\\_\\_\\_\\_) \\cdot \\_\\_\\_\\_\\_ \\, dx`, u: '\\sin x', du: '\\cos x', ops: ['\\sin x', '\\cos x', '\\tan x', '\\sec^2 x'] },
+            { t: () => `\\int \\cos^4(\\_\\_\\_\\_\\_) \\cdot \\_\\_\\_\\_\\_ \\, dx`, u: '\\cos x', du: '-\\sin x', ops: ['\\cos x', '-\\sin x', '\\sin x', '\\cos^2 x'] },
+            { t: () => `\\int \\tan^5(\\_\\_\\_\\_\\_) \\cdot \\_\\_\\_\\_\\_ \\, dx`, u: '\\tan x', du: '\\sec^2 x', ops: ['\\tan x', '\\sec^2 x', '\\cot x', '-\\csc^2 x'] },
+            { t: () => `\\int \\cot^3(\\_\\_\\_\\_\\_) \\cdot \\_\\_\\_\\_\\_ \\, dx`, u: '\\cot x', du: '-\\csc^2 x', ops: ['\\cot x', '-\\csc^2 x', '\\tan x', '\\sec^2 x'] },
+            { t: () => `\\int \\sec^4(\\_\\_\\_\\_\\_) \\cdot \\_\\_\\_\\_\\_ \\, dx`, u: '\\sec x', du: '\\sec x \\tan x', ops: ['\\sec x', '\\sec x \\tan x', '\\tan x', '\\sec^2 x'] },
+            { t: () => `\\int \\csc^5(\\_\\_\\_\\_\\_) \\cdot \\_\\_\\_\\_\\_ \\, dx`, u: '\\csc x', du: '-\\csc x \\cot x', ops: ['\\csc x', '-\\csc x \\cot x', '\\cot x', '-\\csc^2 x'] },
+            { t: () => `\\int \\sin(\\_\\_\\_\\_\\_) \\cdot \\cos(\\_\\_\\_\\_\\_) \\cdot 2 \\, dx`, u: '\\sin(2x)', du: '2\\cos(2x)', ops: ['\\sin(2x)', '2\\cos(2x)', '\\cos(2x)', '-2\\sin(2x)'] },
             
             // NIVEL 4: Polinomios y raíces (22-28)
-            { t: (r) => `\\int (x^2 + 1)^4 \\cdot 2x \\, dx`, u: 'x^2+1', du: '2x', ops: ['x^2+1', '2x', 'x^2', 'x^4'] },
-            { t: (r) => `\\int \\sqrt{x^3 + 2} \\cdot 3x^2 \\, dx`, u: 'x^3+2', du: '3x^2', ops: ['x^3+2', '3x^2', 'x^3', 'x^2'] },
-            { t: (r) => `\\int \\frac{2x}{x^2 + 1} \\, dx`, u: 'x^2+1', du: '2x', ops: ['x^2+1', '2x', 'x^2', 'x'] },
-            { t: (r) => `\\int \\frac{3x^2}{x^3 + 1} \\, dx`, u: 'x^3+1', du: '3x^2', ops: ['x^3+1', '3x^2', 'x^3', 'x^2'] },
-            { t: (r) => `\\int (x^4 + 3x)^5 \\cdot (4x^3 + 3) \\, dx`, u: 'x^4+3x', du: '4x^3+3', ops: ['x^4+3x', '4x^3+3', 'x^4', '4x^3'] },
-            { t: (r) => `\\int \\sqrt[3]{x^5 + 2x} \\cdot (5x^4 + 2) \\, dx`, u: 'x^5+2x', du: '5x^4+2', ops: ['x^5+2x', '5x^4+2', 'x^5', '5x^4'] },
-            { t: (r) => `\\int \\frac{4x^3 + 2x}{x^4 + x^2} \\, dx`, u: 'x^4+x^2', du: '4x^3+2x', ops: ['x^4+x^2', '4x^3+2x', 'x^4', '4x^3'] },
+            { t: () => `\\int (\\_\\_\\_\\_\\_)^4 \\cdot \\_\\_\\_\\_\\_ \\, dx`, u: 'x^2+1', du: '2x', ops: ['x^2+1', '2x', 'x^2', 'x^4'] },
+            { t: () => `\\int \\sqrt{\\_\\_\\_\\_\\_} \\cdot \\_\\_\\_\\_\\_ \\, dx`, u: 'x^3+2', du: '3x^2', ops: ['x^3+2', '3x^2', 'x^3', 'x^2'] },
+            { t: () => `\\int \\frac{\\_\\_\\_\\_\\_}{\\_\\_\\_\\_\\_} \\, dx`, u: 'x^2+1', du: '2x', ops: ['x^2+1', '2x', 'x^2', 'x'] },
+            { t: () => `\\int \\frac{\\_\\_\\_\\_\\_}{\\_\\_\\_\\_\\_} \\, dx`, u: 'x^3+1', du: '3x^2', ops: ['x^3+1', '3x^2', 'x^3', 'x^2'] },
+            { t: () => `\\int (\\_\\_\\_\\_\\_)^5 \\cdot \\_\\_\\_\\_\\_ \\, dx`, u: 'x^4+3x', du: '4x^3+3', ops: ['x^4+3x', '4x^3+3', 'x^4', '4x^3'] },
+            { t: () => `\\int \\sqrt[3]{\\_\\_\\_\\_\\_} \\cdot \\_\\_\\_\\_\\_ \\, dx`, u: 'x^5+2x', du: '5x^4+2', ops: ['x^5+2x', '5x^4+2', 'x^5', '5x^4'] },
+            { t: () => `\\int \\frac{\\_\\_\\_\\_\\_}{\\_\\_\\_\\_\\_} \\, dx`, u: 'x^4+x^2', du: '4x^3+2x', ops: ['x^4+x^2', '4x^3+2x', 'x^4', '4x^3'] },
             
             // NIVEL 5: Exponenciales y logaritmos (29-35)
-            { t: (r) => `\\int e^{x^2} \\cdot 2x \\, dx`, u: 'x^2', du: '2x', ops: ['x^2', '2x', 'e^x', 'e^{x^2}'] },
-            { t: (r) => `\\int e^{\\sin x} \\cdot \\cos x \\, dx`, u: '\\sin x', du: '\\cos x', ops: ['\\sin x', '\\cos x', 'e^x', 'e^{\\sin x}'] },
-            { t: (r) => `\\int \\frac{e^{\\sqrt{x}}}{2\\sqrt{x}} \\, dx`, u: '\\sqrt{x}', du: '\\frac{1}{2\\sqrt{x}}', ops: ['\\sqrt{x}', '\\frac{1}{2\\sqrt{x}}', 'e^x', 'x^{1/2}'] },
-            { t: (r) => `\\int \\frac{\\ln x}{x} \\, dx`, u: '\\ln x', du: '\\frac{1}{x}', ops: ['\\ln x', '\\frac{1}{x}', 'x', '\\ln^2 x'] },
-            { t: (r) => `\\int (\\ln x)^3 \\cdot \\frac{1}{x} \\, dx`, u: '\\ln x', du: '\\frac{1}{x}', ops: ['\\ln x', '\\frac{1}{x}', 'x', '\\ln^3 x'] },
-            { t: (r) => `\\int \\frac{e^x}{1 + e^x} \\, dx`, u: '1+e^x', du: 'e^x', ops: ['1+e^x', 'e^x', 'e^x', 'x'] },
-            { t: (r) => `\\int e^{x + e^x} \\cdot (1 + e^x) \\, dx`, u: 'x+e^x', du: '1+e^x', ops: ['x+e^x', '1+e^x', 'e^x', 'x'] },
+            { t: () => `\\int e^{\\_\\_\\_\\_\\_} \\cdot \\_\\_\\_\\_\\_ \\, dx`, u: 'x^2', du: '2x', ops: ['x^2', '2x', 'e^x', 'e^{x^2}'] },
+            { t: () => `\\int e^{\\_\\_\\_\\_\\_} \\cdot \\_\\_\\_\\_\\_ \\, dx`, u: '\\sin x', du: '\\cos x', ops: ['\\sin x', '\\cos x', 'e^x', 'e^{\\sin x}'] },
+            { t: () => `\\int \\frac{e^{\\_\\_\\_\\_\\_}}{\\_\\_\\_\\_\\_} \\, dx`, u: '\\sqrt{x}', du: '\\frac{1}{2\\sqrt{x}}', ops: ['\\sqrt{x}', '\\frac{1}{2\\sqrt{x}}', 'e^x', 'x^{1/2}'] },
+            { t: () => `\\int \\frac{\\_\\_\\_\\_\\_}{\\_\\_\\_\\_\\_} \\, dx`, u: '\\ln x', du: '\\frac{1}{x}', ops: ['\\ln x', '\\frac{1}{x}', 'x', '\\ln^2 x'] },
+            { t: () => `\\int (\\_\\_\\_\\_\\_)^3 \\cdot \\_\\_\\_\\_\\_ \\, dx`, u: '\\ln x', du: '\\frac{1}{x}', ops: ['\\ln x', '\\frac{1}{x}', 'x', '\\ln^3 x'] },
+            { t: () => `\\int \\frac{\\_\\_\\_\\_\\_}{\\_\\_\\_\\_\\_} \\, dx`, u: '1+e^x', du: 'e^x', ops: ['1+e^x', 'e^x', 'e^x', 'x'] },
+            { t: () => `\\int e^{\\_\\_\\_\\_\\_} \\cdot \\_\\_\\_\\_\\_ \\, dx`, u: 'x+e^x', du: '1+e^x', ops: ['x+e^x', '1+e^x', 'e^x', 'x'] },
             
             // NIVEL 6: Trigonométricas con polinomios (36-42)
-            { t: (r) => `\\int \\sin(x^2) \\cdot 2x \\, dx`, u: 'x^2', du: '2x', ops: ['x^2', '2x', '\\sin x', '\\cos x'] },
-            { t: (r) => `\\int \\cos(\\ln x) \\cdot \\frac{1}{x} \\, dx`, u: '\\ln x', du: '\\frac{1}{x}', ops: ['\\ln x', '\\frac{1}{x}', '\\cos x', '-\\sin x'] },
-            { t: (r) => `\\int \\sec^2(e^x) \\cdot e^x \\, dx`, u: 'e^x', du: 'e^x', ops: ['e^x', 'e^x', '\\sec^2 x', '\\tan x'] },
-            { t: (r) => `\\int \\tan(\\sqrt{x}) \\cdot \\frac{1}{2\\sqrt{x}} \\, dx`, u: '\\sqrt{x}', du: '\\frac{1}{2\\sqrt{x}}', ops: ['\\sqrt{x}', '\\frac{1}{2\\sqrt{x}}', '\\tan x', '\\sec^2 x'] },
-            { t: (r) => `\\int \\sin^2(x) \\cos x \\, dx`, u: '\\sin x', du: '\\cos x', ops: ['\\sin x', '\\cos x', '\\sin^2 x', '2\\sin x\\cos x'] },
-            { t: (r) => `\\int \\cos^3(x) \\sin x \\, dx`, u: '\\cos x', du: '-\\sin x', ops: ['\\cos x', '-\\sin x', '\\cos^3 x', '-3\\cos^2 x\\sin x'] },
-            { t: (r) => `\\int \\frac{\\sec^2(\\ln x)}{x} \\, dx`, u: '\\ln x', du: '\\frac{1}{x}', ops: ['\\ln x', '\\frac{1}{x}', '\\sec^2 x', '\\tan x'] },
+            { t: () => `\\int \\sin(\\_\\_\\_\\_\\_) \\cdot \\_\\_\\_\\_\\_ \\, dx`, u: 'x^2', du: '2x', ops: ['x^2', '2x', '\\sin x', '\\cos x'] },
+            { t: () => `\\int \\cos(\\_\\_\\_\\_\\_) \\cdot \\_\\_\\_\\_\\_ \\, dx`, u: '\\ln x', du: '\\frac{1}{x}', ops: ['\\ln x', '\\frac{1}{x}', '\\cos x', '-\\sin x'] },
+            { t: () => `\\int \\sec^2(\\_\\_\\_\\_\\_) \\cdot \\_\\_\\_\\_\\_ \\, dx`, u: 'e^x', du: 'e^x', ops: ['e^x', 'e^x', '\\sec^2 x', '\\tan x'] },
+            { t: () => `\\int \\tan(\\_\\_\\_\\_\\_) \\cdot \\_\\_\\_\\_\\_ \\, dx`, u: '\\sqrt{x}', du: '\\frac{1}{2\\sqrt{x}}', ops: ['\\sqrt{x}', '\\frac{1}{2\\sqrt{x}}', '\\tan x', '\\sec^2 x'] },
+            { t: () => `\\int \\sin^2(\\_\\_\\_\\_\\_) \\cdot \\_\\_\\_\\_\\_ \\, dx`, u: '\\sin x', du: '\\cos x', ops: ['\\sin x', '\\cos x', '\\sin^2 x', '2\\sin x\\cos x'] },
+            { t: () => `\\int \\cos^3(\\_\\_\\_\\_\\_) \\cdot \\_\\_\\_\\_\\_ \\, dx`, u: '\\cos x', du: '-\\sin x', ops: ['\\cos x', '-\\sin x', '\\cos^3 x', '-3\\cos^2 x\\sin x'] },
+            { t: () => `\\int \\frac{\\sec^2(\\_\\_\\_\\_\\_)}{\\_\\_\\_\\_\\_} \\, dx`, u: '\\ln x', du: '\\frac{1}{x}', ops: ['\\ln x', '\\frac{1}{x}', '\\sec^2 x', '\\tan x'] },
             
             // NIVEL 7: Mixtos y avanzados (43-50)
-            { t: (r) => `\\int \\frac{x}{\\sqrt{1 - x^4}} \\, dx`, u: 'x^2', du: '2x', ops: ['x^2', '2x', '\\sqrt{1-x^4}', '-4x^3'] },
-            { t: (r) => `\\int \\frac{e^x}{1 + e^{2x}} \\, dx`, u: 'e^x', du: 'e^x', ops: ['e^x', 'e^x', 'e^{2x}', '2e^{2x}'] },
-            { t: (r) => `\\int \\frac{\\sin x}{1 + \\cos^2 x} \\, dx`, u: '\\cos x', du: '-\\sin x', ops: ['\\cos x', '-\\sin x', '\\sin x', '\\cos x'] },
-            { t: (r) => `\\int \\frac{1}{x \\sqrt{1 - (\\ln x)^2}} \\, dx`, u: '\\ln x', du: '\\frac{1}{x}', ops: ['\\ln x', '\\frac{1}{x}', 'x', '\\ln^2 x'] },
-            { t: (r) => `\\int x \\cdot \\sqrt[3]{x^2 + 1} \\, dx`, u: 'x^2+1', du: '2x', ops: ['x^2+1', '2x', 'x^2', 'x'] },
-            { t: (r) => `\\int \\frac{x^3}{\\sqrt{1 - x^8}} \\, dx`, u: 'x^4', du: '4x^3', ops: ['x^4', '4x^3', 'x^8', '8x^7'] },
-            { t: (r) => `\\int \\frac{e^{2x}}{\\sqrt{1 - e^{4x}}} \\, dx`, u: 'e^{2x}', du: '2e^{2x}', ops: ['e^{2x}', '2e^{2x}', 'e^{4x}', '4e^{4x}'] },
-            { t: (r) => `\\int \\frac{\\sin(2x)}{1 + \\cos^2 x} \\, dx`, u: '\\cos^2 x', du: '-2\\cos x\\sin x', ops: ['\\cos^2 x', '-2\\cos x\\sin x', '\\sin(2x)', '2\\cos(2x)'] }
+            { t: () => `\\int \\frac{\\_\\_\\_\\_\\_}{\\sqrt{1 - (\\_\\_\\_\\_\\_)^2}} \\, dx`, u: 'x^2', du: '2x', ops: ['x^2', '2x', '\\sqrt{1-x^4}', '-4x^3'] },
+            { t: () => `\\int \\frac{\\_\\_\\_\\_\\_}{1 + (\\_\\_\\_\\_\\_)^2} \\, dx`, u: 'e^x', du: 'e^x', ops: ['e^x', 'e^x', 'e^{2x}', '2e^{2x}'] },
+            { t: () => `\\int \\frac{\\_\\_\\_\\_\\_}{1 + (\\_\\_\\_\\_\\_)^2} \\, dx`, u: '\\cos x', du: '-\\sin x', ops: ['\\cos x', '-\\sin x', '\\sin x', '\\cos x'] },
+            { t: () => `\\int \\frac{1}{\\_\\_\\_\\_\\_ \\cdot \\sqrt{1 - (\\_\\_\\_\\_\\_)^2}} \\, dx`, u: '\\ln x', du: '\\frac{1}{x}', ops: ['\\ln x', '\\frac{1}{x}', 'x', '\\ln^2 x'] },
+            { t: () => `\\int \\_\\_\\_\\_\\_ \\cdot \\sqrt[3]{\\_\\_\\_\\_\\_} \\, dx`, u: 'x^2+1', du: '2x', ops: ['x^2+1', '2x', 'x^2', 'x'] },
+            { t: () => `\\int \\frac{\\_\\_\\_\\_\\_}{\\sqrt{1 - (\\_\\_\\_\\_\\_)^2}} \\, dx`, u: 'x^4', du: '4x^3', ops: ['x^4', '4x^3', 'x^8', '8x^7'] },
+            { t: () => `\\int \\frac{\\_\\_\\_\\_\\_}{\\sqrt{1 - (\\_\\_\\_\\_\\_)^2}} \\, dx`, u: 'e^{2x}', du: '2e^{2x}', ops: ['e^{2x}', '2e^{2x}', 'e^{4x}', '4e^{4x}'] },
+            { t: () => `\\int \\frac{\\sin(2x)}{1 + (\\_\\_\\_\\_\\_)^2} \\, dx`, u: '\\cos^2 x', du: '-2\\cos x\\sin x', ops: ['\\cos^2 x', '-2\\cos x\\sin x', '\\sin(2x)', '2\\cos(2x)'] }
         ];
 
         // Nombres de los niveles
@@ -208,7 +217,7 @@
 
         function refrescarMath() {
             const box = document.getElementById('math-box');
-            box.innerHTML = `\\[ ${actual.t(elegidos)} \\]`;
+            box.innerHTML = `\\[ ${actual.t()} \\]`;
             MathJax.typesetPromise([box]);
         }
 

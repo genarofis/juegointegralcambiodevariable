@@ -49,6 +49,16 @@
             background: #f8f9fa;
             border-radius: 10px;
             margin-bottom: 30px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .integral-parte {
+            display: inline-flex;
+            align-items: center;
         }
         
         .espacio-drop {
@@ -57,7 +67,7 @@
             height: 50px;
             border: 3px dashed #1a73e8;
             border-radius: 8px;
-            margin: 0 10px;
+            margin: 0 5px;
             text-align: center;
             line-height: 50px;
             background: #e8f0fe;
@@ -156,6 +166,11 @@
             min-height: 50px;
             padding: 10px;
         }
+        
+        .latex {
+            font-size: 1.2em;
+            margin: 0 5px;
+        }
     </style>
 </head>
 
@@ -182,7 +197,7 @@
         
         function generarEjercicio() {
             let tipo = aleatorio(1, 8);
-            let u, du, integralHTML;
+            let u, du, partes = [];
             let posU, posDU;
             
             switch(tipo) {
@@ -191,119 +206,119 @@
                     let p = aleatorio(2, 3);
                     u = `x^{${n}}`;
                     du = `${n}x^{${n-1}}`;
-                    posU = 1; // posición dentro del paréntesis
-                    posDU = 2; // posición multiplicando
-                    integralHTML = `
-                        \\(\\int (\\)
-                        <span class="espacio-drop" id="drop1" ondrop="drop(event)" ondragover="allowDrop(event)"></span>
-                        \\( )^{${p}} \\cdot \\)
-                        <span class="espacio-drop" id="drop2" ondrop="drop(event)" ondragover="allowDrop(event)"></span>
-                        \\( dx\\)
-                    `;
+                    posU = 1;
+                    posDU = 2;
+                    partes = [
+                        { tipo: 'latex', valor: '\\int (' },
+                        { tipo: 'drop', id: 'drop1' },
+                        { tipo: 'latex', valor: ')^{' + p + '} \\cdot ' },
+                        { tipo: 'drop', id: 'drop2' },
+                        { tipo: 'latex', valor: ' dx' }
+                    ];
                     break;
                     
-                case 2: // Exponencial - CORREGIDO
+                case 2: // Exponencial
                     let a = aleatorio(2, 4);
                     u = `${a}x`;
                     du = `${a}`;
-                    posU = 2; // exponente
-                    posDU = 1; // multiplicando
-                    integralHTML = `
-                        \\(\\int \\)
-                        <span class="espacio-drop" id="drop1" ondrop="drop(event)" ondragover="allowDrop(event)"></span>
-                        \\( \\cdot e^{ \\)
-                        <span class="espacio-drop" id="drop2" ondrop="drop(event)" ondragover="allowDrop(event)"></span>
-                        \\( } \\, dx\\)
-                    `;
+                    posU = 2;
+                    posDU = 1;
+                    partes = [
+                        { tipo: 'latex', valor: '\\int ' },
+                        { tipo: 'drop', id: 'drop1' },
+                        { tipo: 'latex', valor: ' \\cdot e^{' },
+                        { tipo: 'drop', id: 'drop2' },
+                        { tipo: 'latex', valor: '} dx' }
+                    ];
                     break;
                     
                 case 3: // Seno
                     let b = aleatorio(2, 4);
                     u = `${b}x`;
                     du = `${b}`;
-                    posU = 2; // dentro del seno
-                    posDU = 1; // multiplicando
-                    integralHTML = `
-                        \\(\\int \\)
-                        <span class="espacio-drop" id="drop1" ondrop="drop(event)" ondragover="allowDrop(event)"></span>
-                        \\( \\cdot \\sin(\\)
-                        <span class="espacio-drop" id="drop2" ondrop="drop(event)" ondragover="allowDrop(event)"></span>
-                        \\( ) \\, dx\\)
-                    `;
+                    posU = 2;
+                    posDU = 1;
+                    partes = [
+                        { tipo: 'latex', valor: '\\int ' },
+                        { tipo: 'drop', id: 'drop1' },
+                        { tipo: 'latex', valor: ' \\cdot \\sin(' },
+                        { tipo: 'drop', id: 'drop2' },
+                        { tipo: 'latex', valor: ') dx' }
+                    ];
                     break;
                     
                 case 4: // Coseno
                     let c = aleatorio(2, 4);
                     u = `${c}x`;
                     du = `${c}`;
-                    posU = 2; // dentro del coseno
-                    posDU = 1; // multiplicando
-                    integralHTML = `
-                        \\(\\int \\)
-                        <span class="espacio-drop" id="drop1" ondrop="drop(event)" ondragover="allowDrop(event)"></span>
-                        \\( \\cdot \\cos(\\)
-                        <span class="espacio-drop" id="drop2" ondrop="drop(event)" ondragover="allowDrop(event)"></span>
-                        \\( ) \\, dx\\)
-                    `;
+                    posU = 2;
+                    posDU = 1;
+                    partes = [
+                        { tipo: 'latex', valor: '\\int ' },
+                        { tipo: 'drop', id: 'drop1' },
+                        { tipo: 'latex', valor: ' \\cdot \\cos(' },
+                        { tipo: 'drop', id: 'drop2' },
+                        { tipo: 'latex', valor: ') dx' }
+                    ];
                     break;
                     
                 case 5: // Sec^2
                     let e = aleatorio(2, 4);
                     u = `${e}x`;
                     du = `${e}`;
-                    posU = 2; // dentro de sec^2
-                    posDU = 1; // multiplicando
-                    integralHTML = `
-                        \\(\\int \\)
-                        <span class="espacio-drop" id="drop1" ondrop="drop(event)" ondragover="allowDrop(event)"></span>
-                        \\( \\cdot \\sec^2(\\)
-                        <span class="espacio-drop" id="drop2" ondrop="drop(event)" ondragover="allowDrop(event)"></span>
-                        \\( ) \\, dx\\)
-                    `;
+                    posU = 2;
+                    posDU = 1;
+                    partes = [
+                        { tipo: 'latex', valor: '\\int ' },
+                        { tipo: 'drop', id: 'drop1' },
+                        { tipo: 'latex', valor: ' \\cdot \\sec^2(' },
+                        { tipo: 'drop', id: 'drop2' },
+                        { tipo: 'latex', valor: ') dx' }
+                    ];
                     break;
                     
                 case 6: // Logaritmo
                     u = `\\ln x`;
                     du = `\\frac{1}{x}`;
-                    posU = 2; // denominador
-                    posDU = 1; // numerador
-                    integralHTML = `
-                        \\(\\int \\frac{\\)
-                        <span class="espacio-drop" id="drop1" ondrop="drop(event)" ondragover="allowDrop(event)"></span>
-                        \\( }{\\)
-                        <span class="espacio-drop" id="drop2" ondrop="drop(event)" ondragover="allowDrop(event)"></span>
-                        \\( } \\, dx\\)
-                    `;
+                    posU = 2;
+                    posDU = 1;
+                    partes = [
+                        { tipo: 'latex', valor: '\\int \\frac{' },
+                        { tipo: 'drop', id: 'drop1' },
+                        { tipo: 'latex', valor: '}{' },
+                        { tipo: 'drop', id: 'drop2' },
+                        { tipo: 'latex', valor: '} dx' }
+                    ];
                     break;
                     
-                case 7: // Raíz - CORREGIDO
+                case 7: // Raíz
                     let m = aleatorio(2, 3);
                     u = `x^{${m}}`;
                     du = `${m}x^{${m-1}}`;
-                    posU = 2; // dentro de la raíz
-                    posDU = 1; // multiplicando
-                    integralHTML = `
-                        \\(\\int \\)
-                        <span class="espacio-drop" id="drop1" ondrop="drop(event)" ondragover="allowDrop(event)"></span>
-                        \\( \\cdot \\sqrt[${m}]{ \\}
-                        <span class="espacio-drop" id="drop2" ondrop="drop(event)" ondragover="allowDrop(event)"></span>
-                        \\( ) \\, dx\\)
-                    `;
+                    posU = 2;
+                    posDU = 1;
+                    partes = [
+                        { tipo: 'latex', valor: '\\int ' },
+                        { tipo: 'drop', id: 'drop1' },
+                        { tipo: 'latex', valor: ' \\cdot \\sqrt[' + m + ']{' },
+                        { tipo: 'drop', id: 'drop2' },
+                        { tipo: 'latex', valor: '} dx' }
+                    ];
                     break;
                     
                 case 8: // Csc^2
                     let f = aleatorio(2, 4);
                     u = `${f}x`;
                     du = `${f}`;
-                    posU = 2; // dentro de csc^2
-                    posDU = 1; // multiplicando
-                    integralHTML = `
-                        \\(\\int \\)
-                        <span class="espacio-drop" id="drop1" ondrop="drop(event)" ondragover="allowDrop(event)"></span>
-                        \\( \\cdot \\csc^2(\\)
-                        <span class="espacio-drop" id="drop2" ondrop="drop(event)" ondragover="allowDrop(event)"></span>
-                        \\( ) \\, dx\\)
-                    `;
+                    posU = 2;
+                    posDU = 1;
+                    partes = [
+                        { tipo: 'latex', valor: '\\int ' },
+                        { tipo: 'drop', id: 'drop1' },
+                        { tipo: 'latex', valor: ' \\cdot \\csc^2(' },
+                        { tipo: 'drop', id: 'drop2' },
+                        { tipo: 'latex', valor: ') dx' }
+                    ];
                     break;
             }
             
@@ -334,7 +349,7 @@
                 du: du,
                 posU: posU,
                 posDU: posDU,
-                integralHTML: integralHTML,
+                partes: partes,
                 opciones: opciones,
                 respuestas: { drop1: null, drop2: null }
             };
@@ -343,23 +358,27 @@
         }
         
         function dibujar() {
-            let html = `
-                <div class="ejercicio">
-                    <div class="integral" id="integral">
-                        ${ejercicioActual.integralHTML}
-                    </div>
-                    
-                    <div class="opciones-container">
-            `;
+            let html = '<div class="ejercicio"><div class="integral">';
+            
+            // Construir la integral parte por parte
+            ejercicioActual.partes.forEach(parte => {
+                if (parte.tipo === 'latex') {
+                    html += `<span class="latex">\\(${parte.valor}\\)</span>`;
+                } else {
+                    html += `<span class="espacio-drop" id="${parte.id}" ondrop="drop(event)" ondragover="allowDrop(event)"></span>`;
+                }
+            });
+            
+            html += '</div>';
+            
+            // Agregar opciones
+            html += '<div class="opciones-container">';
             
             ejercicioActual.opciones.forEach((opcion, index) => {
                 html += `<div class="opcion" draggable="true" ondragstart="drag(event)" data-value="${opcion}">\\(${opcion}\\)</div>`;
             });
             
-            html += `
-                    </div>
-                </div>
-            `;
+            html += '</div></div>';
             
             document.getElementById("ejercicio").innerHTML = html;
             
@@ -406,7 +425,7 @@
             
             let correcto = false;
             
-            // Verificar ambas combinaciones posibles (u puede estar en drop1 o drop2)
+            // Verificar ambas combinaciones posibles
             if (ejercicioActual.posU === 1 && ejercicioActual.posDU === 2) {
                 correcto = (resp1 === ejercicioActual.u && resp2 === ejercicioActual.du);
             } else if (ejercicioActual.posU === 2 && ejercicioActual.posDU === 1) {

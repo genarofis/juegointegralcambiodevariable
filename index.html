@@ -2,152 +2,133 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Reto: Completa la Integral</title>
+    <title>Juego de Integrales Pro</title>
+    <script>
+        window.MathJax = {
+            tex: { inlineMath: [['$', '$']], displayMath: [['$$', '$$']] },
+            options: {
+                enableExplorer: true,
+                renderActions: {
+                    addEvents: [200, (doc) => {
+                        // Esta función hace que las clases de LaTeX sean interactivas
+                        document.querySelectorAll('.dropzone').forEach(el => {
+                            el.addEventListener('dragover', e => e.preventDefault());
+                            el.addEventListener('drop', handleDrop);
+                        });
+                    }, '']
+                }
+            }
+        };
+    </script>
     <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; display: flex; flex-direction: column; align-items: center; padding: 20px; }
-        .ejercicio-box { background: white; padding: 30px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); text-align: center; width: 90%; max-width: 800px; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f8f9fa; display: flex; flex-direction: column; align-items: center; padding: 40px; }
+        .card { background: white; padding: 40px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); text-align: center; min-width: 500px; }
         
-        /* Contenedor de la integral */
-        .integral-container {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            font-size: 2.5rem;
-            margin: 40px 0;
-            min-height: 100px;
-        }
-
-        /* Estilo de los huecos para arrastrar */
+        /* Estilo de los huecos dentro de la fórmula */
         .dropzone {
             display: inline-block;
-            min-width: 80px;
-            height: 50px;
-            border: 2px dashed #1a73e8;
-            border-radius: 8px;
+            min-width: 60px;
+            min-height: 40px;
+            border: 2px dashed #1a73e8 !important;
             background: #e8f0fe;
+            margin: 0 5px;
+            border-radius: 5px;
+            cursor: pointer;
             vertical-align: middle;
-            transition: all 0.3s;
-            cursor: default;
-            font-size: 1.5rem;
-            line-height: 50px;
-            padding: 0 10px;
+            color: #1a73e8;
+            padding: 2px 8px;
         }
-        
-        .dropzone.filled { border-style: solid; background: white; width: auto; }
+        .dropzone:hover { background: #d2e3fc; }
 
-        .opciones-container { display: flex; gap: 15px; justify-content: center; flex-wrap: wrap; margin-top: 20px; padding: 20px; background: #f8f9fa; border-radius: 10px; }
-        .opcion { padding: 10px 20px; background: white; border: 2px solid #1a73e8; border-radius: 8px; cursor: grab; font-size: 1.2rem; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .opciones { display: flex; gap: 15px; justify-content: center; margin-top: 30px; }
+        .opcion { padding: 12px 20px; background: white; border: 2px solid #1a73e8; border-radius: 10px; cursor: grab; font-size: 1.3rem; }
         
-        #resultado { margin-top: 20px; font-weight: bold; font-size: 1.2rem; height: 30px; }
-        .score { font-size: 1.5rem; margin-bottom: 10px; color: #1a73e8; }
-        button { background: #1a73e8; color: white; border: none; padding: 10px 25px; border-radius: 20px; cursor: pointer; font-size: 1rem; margin-top: 20px; }
+        #score { font-size: 1.5rem; font-weight: bold; color: #1a73e8; margin-bottom: 20px; }
+        button { margin-top: 30px; padding: 12px 25px; background: #1a73e8; color: white; border: none; border-radius: 25px; cursor: pointer; font-size: 1rem; }
+        #msg { margin-top: 15px; font-weight: bold; height: 25px; }
     </style>
 </head>
 <body>
 
-    <div class="score">Puntuación: <span id="puntos">0</span></div>
+    <div id="score">Puntuación: <span>0</span></div>
 
-    <div class="ejercicio-box">
-        <h2>Arrastra los elementos a los huecos</h2>
-        
-        <div class="integral-container" id="contenedor-integral">
+    <div class="card">
+        <h2>Completa la integral correctamente</h2>
+        <div id="math-area" style="font-size: 3rem; margin: 40px 0;">
             </div>
-
-        <div class="opciones-container" id="opciones"></div>
-        
-        <button onclick="verificar()">Verificar</button>
-        <div id="resultado"></div>
+        <div class="opciones" id="opciones-box"></div>
+        <button onclick="check()">Verificar Resultado</button>
+        <div id="msg"></div>
     </div>
 
     <script>
         let puntos = 0;
-        let uActual, duActual;
-        let r1, r2;
+        let estado = { u: '', du: '', rU: '', rDU: '' };
 
         function generar() {
-            const tipo = Math.floor(Math.random() * 5);
             const n = Math.floor(Math.random() * 3) + 2;
-            let integralHTML = '';
-            
-            // Definimos los casos
-            const casos = [
-                { // Potencia
+            const tipos = [
+                { // División (u en el denominador)
                     u: `x^{${n}}`, du: `${n}x^{${n-1}}`,
-                    pre: '\\int \\left(', post: `\\right)^{${n+1}} \\cdot`, fin: '\\, dx'
+                    tex: `\\int \\frac{\\class{dropzone}{?_{du}}}{\\class{dropzone}{?_{u}}} \\, dx`
+                },
+                { // Raíz cuadrada
+                    u: `x^2+1`, du: `2x`,
+                    tex: `\\int \\class{dropzone}{?_{du}} \\cdot \\sqrt{\\class{dropzone}{?_{u}}} \\, dx`
                 },
                 { // Exponencial
                     u: `${n}x`, du: `${n}`,
-                    pre: '\\int', post: '\\cdot e^{', fin: '} \\, dx'
+                    tex: `\\int \\class{dropzone}{?_{du}} \\cdot e^{\\class{dropzone}{?_{u}}} \\, dx`
                 },
-                { // Raíz
-                    u: `x^2`, du: `2x`,
-                    pre: '\\int', post: '\\cdot \\sqrt{', fin: '} \\, dx'
-                },
-                { // Seno
-                    u: `${n}x`, du: `${n}`,
-                    pre: '\\int', post: '\\cdot \\cos(', fin: ') \\, dx'
-                },
-                { // Logaritmo (especial)
-                    u: `x`, du: `1`,
-                    pre: '\\int \\frac{1}{', post: '}', fin: '\\, dx', dist: ['\\ln x', 'x^2']
+                { // Logaritmo
+                    u: `\\ln x`, du: `\\frac{1}{x}`,
+                    tex: `\\int \\class{dropzone}{?_{u}} \\cdot \\class{dropzone}{?_{du}} \\, dx`
                 }
             ];
 
-            const caso = casos[tipo];
-            uActual = caso.u;
-            duActual = caso.du;
-            r1 = r2 = null;
+            const sel = tipos[Math.floor(Math.random() * tipos.length)];
+            estado = { u: sel.u, du: sel.du, rU: '', rDU: '' };
 
-            // Construimos la estructura mezclando MathJax y Divs
-            integralHTML = `
-                <span>\\(${caso.pre}\\)</span>
-                <div id="z1" class="dropzone" ondrop="drop(event, 1)" ondragover="allowDrop(event)"></div>
-                <span>\\(${caso.post}\\)</span>
-                <div id="z2" class="dropzone" ondrop="drop(event, 2)" ondragover="allowDrop(event)"></div>
-                <span>\\(${caso.fin}\\)</span>
-            `;
-
-            document.getElementById('contenedor-integral').innerHTML = integralHTML;
-
+            document.getElementById('math-area').innerHTML = `$$${sel.tex}$$`;
+            
             // Opciones
-            let ops = [caso.u, caso.du, 'x^3', '5'].sort(() => Math.random() - 0.5);
-            document.getElementById('opciones').innerHTML = ops.map(o => 
-                `<div class="opcion" draggable="true" ondragstart="drag(event)" data-val="${o}">\\(${o}\\)</div>`
+            const ops = [sel.u, sel.du, 'x', '7'].sort(() => Math.random() - 0.5);
+            document.getElementById('opciones-box').innerHTML = ops.map(o => 
+                `<div class="opcion" draggable="true" ondragstart="drag(event)" data-val="${o}">$${o}$</div>`
             ).join('');
 
-            MathJax.typeset();
+            MathJax.typesetPromise();
         }
 
         function drag(e) { e.dataTransfer.setData("text", e.target.dataset.val); }
-        function allowDrop(e) { e.preventDefault(); }
-        
-        function drop(e, zona) {
+
+        function handleDrop(e) {
             e.preventDefault();
             const val = e.dataTransfer.getData("text");
-            const target = e.target.classList.contains('dropzone') ? e.target : e.target.closest('.dropzone');
+            const target = e.target.closest('.dropzone');
             
-            target.innerHTML = `\\(${val}\\)`;
-            target.classList.add('filled');
-            
-            if(zona === 1) r1 = val;
-            else r2 = val;
-            
-            MathJax.typesetPromise([target]);
+            // Guardamos la respuesta según qué hueco sea
+            if (target.innerText.includes('u') && !target.innerText.includes('du')) {
+                estado.rU = val;
+            } else {
+                estado.rDU = val;
+            }
+
+            target.innerHTML = val;
+            target.style.borderStyle = "solid";
+            MathJax.typesetPromise();
         }
 
-        function verificar() {
-            const res = document.getElementById('resultado');
-            // Nota: En algunos casos u y du pueden ser intercambiables visualmente 
-            // pero aquí validamos la lógica del cambio de variable estándar
-            if (r1 === uActual && r2 === duActual) {
-                res.innerHTML = "<span style='color:green'>¡Correcto!</span>";
+        function check() {
+            const m = document.getElementById('msg');
+            if (estado.rU === estado.u && estado.rDU === estado.du) {
                 puntos++;
-                document.getElementById('puntos').innerText = puntos;
-                setTimeout(() => { res.innerHTML = ""; generar(); }, 1500);
+                document.querySelector('#score span').innerText = puntos;
+                m.innerHTML = "<span style='color:green'>¡Excelente razonamiento!</span>";
+                setTimeout(() => { m.innerText = ""; generar(); }, 1500);
             } else {
-                res.innerHTML = "<span style='color:red'>Incorrecto. Revisa el orden.</span>";
+                m.innerHTML = "<span style='color:red'>Revisa la posición de u y su derivada du.</span>";
             }
         }
 

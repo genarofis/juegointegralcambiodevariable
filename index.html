@@ -2,97 +2,124 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Reto de Integrales Pro</title>
+    <title>Master de Integrales: Cambio de Variable</title>
     <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background: #f4f7f9; display: flex; flex-direction: column; align-items: center; padding: 40px; }
-        .card { background: white; padding: 30px; border-radius: 15px; box-shadow: 0 8px 20px rgba(0,0,0,0.1); text-align: center; width: 100%; max-width: 700px; }
+        body { font-family: 'Segoe UI', sans-serif; background: #eef2f3; display: flex; flex-direction: column; align-items: center; padding: 20px; }
+        .card { background: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); text-align: center; width: 100%; max-width: 800px; }
+        .puntos-box { display: flex; gap: 20px; margin-bottom: 15px; font-size: 1.2rem; font-weight: bold; }
+        #nivel-tag { color: #d93025; background: #feefee; padding: 2px 10px; border-radius: 5px; }
+        #score-tag { color: #1a73e8; }
         
         .display-integral { 
-            font-size: 3.5rem; 
-            margin: 30px 0; 
-            padding: 20px;
-            background: #fff;
-            border-radius: 10px;
-            min-height: 120px;
+            font-size: 3.2rem; 
+            margin: 25px 0; 
+            padding: 30px;
+            background: #fafafa;
+            border: 1px solid #eee;
+            border-radius: 15px;
+            min-height: 140px;
             display: flex;
             justify-content: center;
             align-items: center;
         }
 
         .controles { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-top: 20px; }
-        
         .btn-opcion { 
-            padding: 12px 20px; 
+            padding: 12px 18px; 
             background: #fff; 
             border: 2px solid #1a73e8; 
             color: #1a73e8;
-            border-radius: 8px; 
+            border-radius: 10px; 
             cursor: pointer; 
             font-size: 1.2rem;
             transition: 0.2s;
         }
-        .btn-opcion:hover { background: #e8f0fe; }
+        .btn-opcion:hover { background: #1a73e8; color: white; }
         
-        .btn-reset { background: #f1f3f4; border: 1px solid #ccc; padding: 8px 15px; border-radius: 5px; cursor: pointer; margin-top: 10px; }
-        
-        .puntos { font-size: 1.5rem; font-weight: bold; color: #1a73e8; margin-bottom: 15px; }
-        .msg { margin-top: 20px; font-weight: bold; font-size: 1.2rem; height: 30px; }
-        
-        .instrucciones { color: #5f6368; margin-bottom: 20px; }
-        .verificar-btn { background: #1a73e8; color: white; border: none; padding: 15px 40px; border-radius: 30px; font-size: 1.1rem; cursor: pointer; margin-top: 20px; }
+        .btn-reset { background: #6c757d; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; margin-top: 15px; }
+        .verificar-btn { background: #1a73e8; color: white; border: none; padding: 15px 45px; border-radius: 30px; font-size: 1.2rem; cursor: pointer; margin-top: 25px; box-shadow: 0 4px 6px rgba(26,115,232,0.3); }
+        .msg { margin-top: 20px; font-weight: bold; font-size: 1.1rem; height: 30px; }
     </style>
 </head>
 <body>
 
-    <div class="puntos">Puntuación: <span id="score">0</span></div>
+    <div class="puntos-box">
+        <div id="score-tag">Puntos: <span id="score">0</span></div>
+        <div id="nivel-tag">Nivel: <span id="nivel">1</span></div>
+    </div>
 
     <div class="card">
-        <h2>Completa la Integral</h2>
-        <p class="instrucciones">Haz clic en los botones para rellenar los espacios $[\dots]$ en orden.</p>
+        <h2 id="titulo">Completa la forma $f(u) \cdot du$</h2>
+        <p style="color: #666;">Selecciona las funciones para rellenar los huecos en orden.</p>
         
-        <div class="display-integral" id="math-box">
-            </div>
+        <div class="display-integral" id="math-box"></div>
 
         <div class="controles" id="botones-opciones"></div>
         
-        <button class="btn-reset" onclick="resetIntegral()">Borrar espacios</button>
+        <button class="btn-reset" onclick="resetIntegral()">Reiniciar espacios</button>
         <br>
-        <button class="verificar-btn" onclick="verificar()">Comprobar Resultado</button>
+        <button class="verificar-btn" onclick="verificar()">Validar Cambio</button>
         
         <div id="msg" class="msg"></div>
     </div>
 
     <script>
         let score = 0;
+        let nivel = 1;
         let actual = {};
-        let respuestas = []; // Guardará lo que el usuario elige
+        let respuestas = [];
 
-        const EJERCICIOS = [
-            {
-                template: (r) => `\\int ${r[0] || '[\\dots]'} \\cdot e^{${r[1] || '[\\dots]'}} \\, dx`,
-                u: '3x', du: '3', ops: ['3', '3x', 'x', 'e^x']
-            },
-            {
-                template: (r) => `\\int ${r[0] || '[\\dots]'} \\cdot \\sqrt{${r[1] || '[\\dots]'}} \\, dx`,
-                u: 'x^2', du: '2x', ops: ['2x', 'x^2', 'x', '2']
-            },
-            {
-                template: (r) => `\\int \\frac{${r[0] || '[\\dots]'}}{${r[1] || '[\\dots]'}} \\, dx`,
-                u: 'x^3', du: '3x^2', ops: ['3x^2', 'x^3', 'x^2', '3']
-            },
-            {
-                template: (r) => `\\int ${r[0] || '[\\dots]'} \\cdot \\cos(${r[1] || '[\\dots]'}) \\, dx`,
-                u: '5x', du: '5', ops: ['5', '5x', 'x', '\\sin x']
-            }
-        ];
+        // BASE DE DATOS DE EJERCICIOS POR NIVEL
+        const DB = {
+            nivel1: [
+                { // Potencia positiva
+                    template: (r) => `\\int (${r[0] || '[\\dots]'})^{5} \\cdot ${r[1] || '[\\dots]'} \\, dx`,
+                    u: 'x^2', du: '2x', ops: ['x^2', '2x', 'x', '2']
+                },
+                { // Trigonométrica básica
+                    template: (r) => `\\int \\sin(${r[0] || '[\\dots]'}) \\cdot ${r[1] || '[\\dots]'} \\, dx`,
+                    u: '4x', du: '4', ops: ['4x', '4', 'x', '\\cos x']
+                },
+                { // Exponencial
+                    template: (r) => `\\int e^{${r[0] || '[\\dots]'}} \\cdot ${r[1] || '[\\dots]'} \\, dx`,
+                    u: 'x^3', du: '3x^2', ops: ['x^3', '3x^2', 'x^2', '3']
+                },
+                { // Logaritmo simple
+                    template: (r) => `\\int \\frac{1}{x} \\cdot (${r[0] || '[\\dots]'}) \\, dx`,
+                    u: '\\ln x', du: '\\frac{1}{x}', ops: ['\\ln x', '\\frac{1}{x}', 'x', 'e^x'],
+                    ordenEspecial: true // Para que acepte u en r[0]
+                }
+            ],
+            nivel2: [
+                { // Potencia negativa
+                    template: (r) => `\\int (${r[0] || '[\\dots]'})^{-2} \\cdot ${r[1] || '[\\dots]'} \\, dx`,
+                    u: 'x^4', du: '4x^3', ops: ['x^4', '4x^3', 'x^3', '4']
+                },
+                { // Raíz (Potencia fraccionaria)
+                    template: (r) => `\\int \\sqrt{${r[0] || '[\\dots]'}} \\cdot ${r[1] || '[\\dots]'} \\, dx`,
+                    u: 'x^2+5', du: '2x', ops: ['x^2+5', '2x', 'x', '5']
+                },
+                { // Trigonométrica Secante
+                    template: (r) => `\\int \\sec^2(${r[0] || '[\\dots]'}) \\cdot ${r[1] || '[\\dots]'} \\, dx`,
+                    u: 'x^5', du: '5x^4', ops: ['x^5', '5x^4', '5x', 'x^4']
+                },
+                { // Potencia fraccionaria compleja
+                    template: (r) => `\\int (${r[0] || '[\\dots]'})^{\\frac{1}{2}} \\cdot ${r[1] || '[\\dots]'} \\, dx`,
+                    u: '\\sin x', du: '\\cos x', ops: ['\\sin x', '\\cos x', 'x', '1']
+                }
+            ]
+        };
 
         function nuevaIntegral() {
-            actual = EJERCICIOS[Math.floor(Math.random() * EJERCICIOS.length)];
+            nivel = score >= 10 ? 2 : 1;
+            document.getElementById('nivel').innerText = nivel;
+            const lista = nivel === 1 ? DB.nivel1 : DB.nivel2;
+            
+            actual = lista[Math.floor(Math.random() * lista.length)];
             respuestas = [];
             render();
             
-            // Mezclar opciones y crear botones
             const botones = [...actual.ops].sort(() => Math.random() - 0.5);
             document.getElementById('botones-opciones').innerHTML = botones.map(opt => 
                 `<button class="btn-opcion" onclick="elegir('${opt}')">\\(${opt}\\)</button>`
@@ -115,7 +142,6 @@
 
         function render() {
             const box = document.getElementById('math-box');
-            // Generamos el string de LaTeX puro usando la plantilla y las respuestas
             const tex = actual.template(respuestas);
             box.innerHTML = `\\[ ${tex} \\]`;
             MathJax.typesetPromise([box]);
@@ -124,19 +150,24 @@
         function verificar() {
             const m = document.getElementById('msg');
             if (respuestas.length < 2) {
-                m.innerHTML = "<span style='color:orange'>Rellena ambos espacios primero.</span>";
+                m.innerHTML = "<span style='color:orange'>Faltan datos.</span>";
                 return;
             }
 
-            // En la mayoría de mis plantillas: r[0] es du y r[1] es u
-            // Excepto en la fracción donde r[0] es du (arriba) y r[1] es u (abajo)
-            if (respuestas[0] === actual.du && respuestas[1] === actual.u) {
-                m.innerHTML = "<span style='color:green'>¡Correcto! +1 punto</span>";
+            // Lógica de validación: r[0] debe ser U y r[1] debe ser DU
+            // Esto cumple con la estructura f(u) * du solicitada
+            let esCorrecto = (respuestas[0] === actual.u && respuestas[1] === actual.du);
+            
+            // Excepción para el logaritmo si se desea permitir flexibilidad
+            if (actual.ordenEspecial && respuestas[0] === actual.u) esCorrecto = true;
+
+            if (esCorrecto) {
+                m.innerHTML = "<span style='color:green'>¡Correcto! f(u) du identificado.</span>";
                 score++;
                 document.getElementById('score').innerText = score;
                 setTimeout(() => { m.innerText = ""; nuevaIntegral(); }, 1500);
             } else {
-                m.innerHTML = "<span style='color:red'>Incorrecto. Revisa el cambio de variable.</span>";
+                m.innerHTML = "<span style='color:red'>Incorrecto. Recuerda: primero la función u, luego su derivada du.</span>";
             }
         }
 

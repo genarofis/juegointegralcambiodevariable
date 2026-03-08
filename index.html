@@ -202,7 +202,7 @@
                     `;
                     break;
                     
-                case 2: // Exponencial
+                case 2: // Exponencial - CORREGIDO
                     let a = aleatorio(2, 4);
                     u = `${a}x`;
                     du = `${a}`;
@@ -211,7 +211,7 @@
                     integralHTML = `
                         \\(\\int \\)
                         <span class="espacio-drop" id="drop1" ondrop="drop(event)" ondragover="allowDrop(event)"></span>
-                        \\( \\cdot e^{\\;\\)
+                        \\( \\cdot e^{\\, \\)
                         <span class="espacio-drop" id="drop2" ondrop="drop(event)" ondragover="allowDrop(event)"></span>
                         \\( } \\, dx\\)
                     `;

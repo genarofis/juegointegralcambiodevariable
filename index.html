@@ -217,10 +217,16 @@ html+=`<div>`
 
 ejercicioActual.opciones.forEach(o=>{
 
-html+=`<div class="opcion" draggable="true" ondragstart="drag(event)" id="${o}">${o}</div>`
+html+=`<div class="opcion" draggable="true"
+ondragstart="drag(event)"
+data-id="${o.id}"
+id="opt${Math.random()}">
+
+\\(${o.texto}\\)
+
+</div>`
 
 })
-
 html+=`</div></div>`
 
 document.getElementById("ejercicio").innerHTML=html
@@ -235,12 +241,19 @@ ev.preventDefault()
 
 }
 
-function drag(ev){
+function drop(ev){
 
-ev.dataTransfer.setData("text",ev.target.id)
+ev.preventDefault()
+
+let id=ev.dataTransfer.getData("id")
+
+ev.target.dataset.value=id
+
+ev.target.innerHTML="✓"
 
 }
 
+  
 function drop(ev){
 
 ev.preventDefault()
@@ -252,16 +265,22 @@ ev.target.innerHTML=data
 ev.target.setAttribute("data-value",data)
 
 }
-
-function verificar(){
+unction verificar(){
 
 let u=document.getElementById("u").dataset.value
-
 let du=document.getElementById("du").dataset.value
 
-if(u==ejercicioActual.u && du==ejercicioActual.du){
+if(u=="u" && du=="du"){
 
-document.getElementById("resultado").innerHTML="<span class='correcto'>Muy bien</span>"
+document.getElementById("resultado").innerHTML="Muy bien"
+
+}else{
+
+document.getElementById("resultado").innerHTML="Intenta otra vez"
+
+}
+
+
 
 puntuacion++
 

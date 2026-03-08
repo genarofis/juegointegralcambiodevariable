@@ -2,94 +2,89 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Master de Integrales: 50 Retos</title>
+    <title>Reto de Integrales 50</title>
     <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background: #f0f4f8; display: flex; flex-direction: column; align-items: center; padding: 20px; }
-        .card { background: white; padding: 40px; border-radius: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); text-align: center; width: 100%; max-width: 900px; }
-        .integral-area { font-size: 2.5rem; margin: 30px 0; min-height: 120px; display: flex; justify-content: center; align-items: center; }
-        .controles { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-top: 20px; }
-        .btn-opcion { padding: 12px 20px; background: white; border: 2px solid #2980b9; color: #2980b9; border-radius: 10px; cursor: pointer; font-size: 1.2rem; }
-        .btn-check { background: #27ae60; color: white; border: none; padding: 15px 50px; border-radius: 40px; font-size: 1.3rem; margin-top: 20px; cursor: pointer; }
-        .feedback { margin-top: 20px; font-weight: bold; font-size: 1.2rem; min-height: 30px; }
+        body { font-family: sans-serif; background: #f4f7f6; padding: 20px; display: flex; flex-direction: column; align-items: center; }
+        .card { background: white; padding: 30px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 100%; max-width: 800px; }
+        .integral-area { font-size: 2.5rem; margin: 20px 0; text-align: center; min-height: 100px; }
+        .controles { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin: 20px 0; }
+        .btn-opcion { padding: 10px 15px; border: 1px solid #2980b9; background: white; color: #2980b9; cursor: pointer; border-radius: 5px; }
+        .btn-action { padding: 10px 20px; cursor: pointer; border-radius: 5px; border: none; color: white; }
+        #btn-borrar { background: #e74c3c; } #btn-saltar { background: #f39c12; }
+        .feedback { font-weight: bold; margin-top: 15px; }
     </style>
 </head>
 <body>
+
 <div class="card">
-    <div id="progreso" style="font-weight:bold; color:#7f8c8d;">Cargando...</div>
+    <div id="progreso">Ejercicio 1/50</div>
     <div class="integral-area" id="math-box"></div>
-    <div id="botones-opciones" class="controles"></div>
-    <br>
-    <button class="btn-check" onclick="validar()">Verificar</button>
+    <div id="opciones-container" class="controles"></div>
+    <div class="controles">
+        <button id="btn-borrar" class="btn-action" onclick="revertir()">Borrar última opción</button>
+        <button id="btn-saltar" class="btn-action" onclick="saltar()">Saltar ejercicio</button>
+    </div>
+    <div style="text-align: center;">
+        <button style="padding: 15px 40px; background: #27ae60; color: white; border: none; border-radius: 20px; cursor: pointer;" onclick="validar()">Verificar</button>
+    </div>
     <div id="feedback" class="feedback"></div>
 </div>
 
 <script>
 let score = 0;
-let currentIndex = 0;
-let fallos = 0;
+let index = 0;
 let elegidos = [];
 let actual = {};
-let EJERCICIOS = [];
 
-function generarEjercicios() {
-    const bases = [
-        { u: 'x^3+2x+5', du: '3x^2+2', ops: ['x^3+2x+5', '3x^2+2', 'x^2+x', '2x+1'] },
-        { u: '\\ln(x^2+x+1)', du: '\\frac{2x+1}{x^2+x+1}', ops: ['\\ln(x^2+x+1)', '\\frac{2x+1}{x^2+x+1}', 'x^2+x+1', '2x+1'] },
-        { u: '\\sin(x^2+3x+1)', du: '(2x+3)\\cos(x^2+3x+1)', ops: ['\\sin(x^2+3x+1)', '(2x+3)\\cos(x^2+3x+1)', 'x^2+3x+1', '2x+3'] },
-        { u: '(x^2+x+1)^{1/2}', du: '\\frac{2x+1}{2\\sqrt{x^2+x+1}}', ops: ['(x^2+x+1)^{1/2}', '\\frac{2x+1}{2\\sqrt{x^2+x+1}}', 'x^2+x+1', '2x+1'] },
-        { u: '(x^3+x^2+x)^{-1/2}', du: '-\\frac{1}{2}(3x^2+2x+1)(x^3+x^2+x)^{-3/2}', ops: ['(x^3+x^2+x)^{-1/2}', '-\\frac{1}{2}(3x^2+2x+1)(x^3+x^2+x)^{-3/2}', 'x^3+x^2+x', '3x^2+2x+1'] }
-    ];
-
-    for(let i=0; i<50; i++) {
-        let b = bases[i % bases.length];
-        EJERCICIOS.push({
-            t: (r) => `\\int (${r[0]||'\\square'}) \\cdot ${r[1]||'\\square'} \\, dx`,
-            u: b.u, du: b.du, ops: b.ops
-        });
-    }
-}
+const EJERCICIOS = [
+    { u: "x^2+x+4", du: "2x+1", ops: ["x^2+x+4", "2x+1", "x^2+4", "2x"] },
+    { u: "e^{3x}", du: "3e^{3x}", ops: ["e^{3x}", "3e^{3x}", "e^x", "e"] },
+    { u: "\\ln(x)", du: "1/x", ops: ["\\ln(x)", "1/x", "x", "\\ln(2x)"] }
+    // ... agrega tus 50 ejercicios aquí con el mismo formato
+];
 
 function cargar() {
-    if(currentIndex >= 50) { 
-        alert("¡Terminaste! Tu puntuación final: " + score); return; 
-    }
-    actual = EJERCICIOS[currentIndex];
+    actual = EJERCICIOS[index % EJERCICIOS.length];
     elegidos = [];
-    fallos = 0;
-    document.getElementById('progreso').innerText = `Ejercicio ${currentIndex + 1}/50 | Puntos: ${score}`;
-    refrescar();
+    document.getElementById('progreso').innerText = `Ejercicio ${index + 1}/50 | Puntos: ${score}`;
+    render();
 }
 
-function refrescar() {
+function render() {
+    // Usamos espacios en blanco seguros
     const box = document.getElementById('math-box');
-    box.innerHTML = `\\[ ${actual.t(elegidos)} \\]`;
-    const cont = document.getElementById('botones-opciones');
-    cont.innerHTML = actual.ops.map(o => `<button class="btn-opcion" onclick="pulsar('${o}')">\\(${o}\\)</button>`).join('');
+    const u_val = elegidos[0] ? `(${elegidos[0]})` : "\\_\\_\\_";
+    const du_val = elegidos[1] ? `(${elegidos[1]})` : "\\_\\_\\_";
+    box.innerHTML = `\\[ \\int ${du_val} \\cdot (${u_val})^{-1} dx \\]`;
+    
+    const cont = document.getElementById('opciones-container');
+    cont.innerHTML = "";
+    
+    // Mezcla aleatoria para evitar que siempre sean 1 y 2
+    [...actual.ops].sort(() => Math.random() - 0.5).forEach(op => {
+        const btn = document.createElement('button');
+        btn.className = 'btn-opcion';
+        btn.innerHTML = `\\(${op}\\)`;
+        btn.onclick = () => { if(elegidos.length < 2) { elegidos.push(op); render(); } };
+        cont.appendChild(btn);
+    });
     MathJax.typesetPromise();
 }
 
-function pulsar(v) { if(elegidos.length < 2) { elegidos.push(v); refrescar(); } }
+function revertir() { elegidos.pop(); render(); }
+function saltar() { index++; cargar(); }
 
 function validar() {
     if(elegidos[0] === actual.u && elegidos[1] === actual.du) {
         document.getElementById('feedback').innerText = "✅ ¡Correcto!";
-        score++; currentIndex++;
-        setTimeout(cargar, 1000);
+        score++; index++; setTimeout(cargar, 1000);
     } else {
-        fallos++;
-        if(fallos >= 2) {
-            document.getElementById('feedback').innerText = "❌ Fallaste 2 veces. Saltando...";
-            currentIndex++;
-            setTimeout(cargar, 1000);
-        } else {
-            document.getElementById('feedback').innerText = "❌ Incorrecto. Intento " + fallos + "/2";
-            elegidos = []; refrescar();
-        }
+        document.getElementById('feedback').innerText = "❌ Incorrecto. Intenta de nuevo.";
+        elegidos = []; render();
     }
 }
 
-generarEjercicios();
 window.onload = cargar;
 </script>
 </body>
